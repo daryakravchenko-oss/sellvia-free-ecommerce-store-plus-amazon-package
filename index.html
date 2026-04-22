@@ -2483,6 +2483,779 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </section>
 
+<!-- ═══ AMAZON KIT DEEP-DIVE ═══ -->
+<style>
+.amzkit-sec {
+  background: var(--c-lightbg);
+  padding: 120px 100px;
+  font-family: var(--font);
+}
+.amzkit-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.amzkit-head {
+  text-align: center;
+  margin-bottom: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.amzkit-pill { margin-bottom: 22px; }
+.amzkit-h2 {
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--c-near);
+  letter-spacing: -.028em;
+  line-height: 1.05;
+  margin-bottom: 18px;
+}
+.amzkit-sub {
+  font-size: 21px;
+  color: var(--c-gray2);
+  line-height: 1.45;
+  max-width: 640px;
+}
+.amzkit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.amzkit-card {
+  background: #fff;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 12px 40px rgba(0,0,0,0.06);
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+  display: flex;
+  flex-direction: column;
+}
+.amzkit-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 22px 60px rgba(0,0,0,0.09);
+}
+.amzkit-visual {
+  aspect-ratio: 3/2;
+  background: #f0f0f3;
+  overflow: hidden;
+}
+.amzkit-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.amzkit-body {
+  padding: 32px 36px 40px;
+}
+.amzkit-card-h3 {
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  color: var(--c-near);
+  line-height: 1.2;
+}
+.amzkit-card-p {
+  font-size: 17px;
+  color: var(--c-gray2);
+  line-height: 1.5;
+  margin-top: 12px;
+}
+.amzkit-cta {
+  text-align: center;
+  margin-top: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.amzkit-fine {
+  font-size: 14px;
+  color: var(--c-gray3);
+}
+
+/* ── Buyers card: product → world map crossfade (12s loop, Shopify-style) ── */
+.amzkit-anim-buyers {
+  background: #eaf3fb;
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font);
+}
+
+/* Two views layered, crossfade with subtle slide-up */
+.anim-view {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.view-product {
+  background: #cfe6f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+  animation: viewA-fade 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.view-globe {
+  background: #eaf3fb;
+  animation: viewB-fade 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.map-bg {
+  position: absolute;
+  inset: 0;
+  background: url('img/AmazonKit/world-map.jpg') center/cover no-repeat;
+  transform: scale(2);
+  transform-origin: 22% 38%;
+  animation: map-zoom 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  z-index: 0;
+}
+@keyframes map-zoom {
+  0%, 46% { transform: scale(2); }
+  58%, 94% { transform: scale(1); }
+  100% { transform: scale(2); }
+}
+
+@keyframes viewA-fade {
+  0% { opacity: 0; transform: translateY(8px); }
+  3%, 38% { opacity: 1; transform: translateY(0); }
+  44%, 96% { opacity: 0; transform: translateY(-8px); }
+  100% { opacity: 0; transform: translateY(8px); }
+}
+@keyframes viewB-fade {
+  0%, 38% { opacity: 0; transform: translateY(8px); }
+  44%, 94% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-8px); }
+}
+
+/* ─ View A: product card (centered on solid background) ─ */
+.prod-card {
+  width: 64%;
+  max-width: 280px;
+  height: calc(100% - 20px);
+  max-height: 320px;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 14px 32px rgba(15, 50, 95, 0.16);
+  display: flex;
+  flex-direction: column;
+}
+.prod-hero {
+  flex: 1 1 auto;
+  min-height: 90px;
+  background: #cfe6f5;
+  overflow: hidden;
+}
+.prod-hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 28%;
+  transform: scale(1.22);
+  transform-origin: center 36%;
+  display: block;
+}
+.prod-info {
+  flex: 0 0 auto;
+  padding: 10px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.prod-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1d1d1f;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.prod-desc {
+  font-size: 12px;
+  color: #6e6e73;
+  line-height: 1.35;
+}
+.prod-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+.rating-stars {
+  display: inline-flex;
+  gap: 1px;
+  color: #f5a623;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+.rating-count {
+  font-size: 11px;
+  color: #6e6e73;
+}
+.prod-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin-top: 2px;
+}
+
+/* ─ View B: pins on the map ─ */
+.map-pin {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  opacity: 0;
+}
+.pin-dot {
+  width: 100%;
+  height: 100%;
+  background: #f5a623;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(245, 166, 35, 0.55);
+  position: relative;
+  z-index: 2;
+}
+.pin-thumb {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  width: 28px;
+  height: 28px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  transform-origin: bottom center;
+  color: #f5a623;
+}
+.pin-thumb svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+  fill: currentColor;
+}
+
+/* Pin positions — pin-1 at zoom origin (appears during close-up), others appear after zoom-out */
+.pin-1 { top: 38%; left: 22%; z-index: 1; animation: pin-1-show 12s ease-in-out infinite; }
+.pin-2 { top: 30%; left: 50%; z-index: 1; animation: pin-2-show 12s ease-in-out infinite; }
+.pin-3 { top: 46%; left: 70%; z-index: 1; animation: pin-3-show 12s ease-in-out infinite; }
+.pin-4 { top: 30%; left: 16%; z-index: 1; animation: pin-4-show 12s ease-in-out infinite; }
+
+.pin-1 .pin-thumb { animation: thumb-1-pop 12s ease-in-out infinite; }
+.pin-2 .pin-thumb { animation: thumb-2-pop 12s ease-in-out infinite; }
+.pin-3 .pin-thumb { animation: thumb-3-pop 12s ease-in-out infinite; }
+.pin-4 .pin-thumb { animation: thumb-4-pop 12s ease-in-out infinite; }
+
+.pin-1 .pin-dot { animation: dot-pulse 2.4s ease-out infinite; }
+.pin-2 .pin-dot { animation: dot-pulse 2.4s ease-out infinite 0.3s; }
+.pin-3 .pin-dot { animation: dot-pulse 2.4s ease-out infinite 0.6s; }
+.pin-4 .pin-dot { animation: dot-pulse 2.4s ease-out infinite 0.9s; }
+
+@keyframes dot-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(245, 166, 35, 0.55); }
+  70% { box-shadow: 0 0 0 10px rgba(245, 166, 35, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 166, 35, 0); }
+}
+
+/* pin-1 appears during close-up (map at scale 2), stays through zoom-out */
+@keyframes pin-1-show {
+  0%, 45% { opacity: 0; }
+  48%, 93% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+@keyframes thumb-1-pop {
+  0%, 46% { transform: translateX(-50%) scale(0); }
+  52%, 93% { transform: translateX(-50%) scale(1); }
+  96%, 100% { transform: translateX(-50%) scale(0); }
+}
+
+/* pins 2-4 appear after zoom-out completes (~58%) */
+@keyframes pin-2-show {
+  0%, 61% { opacity: 0; }
+  64%, 93% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+@keyframes thumb-2-pop {
+  0%, 62% { transform: translateX(-50%) scale(0); }
+  68%, 93% { transform: translateX(-50%) scale(1); }
+  96%, 100% { transform: translateX(-50%) scale(0); }
+}
+
+@keyframes pin-3-show {
+  0%, 69% { opacity: 0; }
+  72%, 93% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+@keyframes thumb-3-pop {
+  0%, 70% { transform: translateX(-50%) scale(0); }
+  76%, 93% { transform: translateX(-50%) scale(1); }
+  96%, 100% { transform: translateX(-50%) scale(0); }
+}
+
+@keyframes pin-4-show {
+  0%, 77% { opacity: 0; }
+  80%, 93% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+@keyframes thumb-4-pop {
+  0%, 78% { transform: translateX(-50%) scale(0); }
+  84%, 93% { transform: translateX(-50%) scale(1); }
+  96%, 100% { transform: translateX(-50%) scale(0); }
+}
+
+/* Floating notification panel — overlay on map */
+.globe-panel {
+  position: absolute;
+  left: 24px;
+  bottom: 24px;
+  width: min(320px, 60%);
+  background: #fff;
+  padding: 16px 18px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 12px 32px rgba(15, 50, 95, 0.18);
+  z-index: 5;
+}
+
+/* Overlapping avatar row */
+.gp-avatars {
+  display: flex;
+  align-items: center;
+}
+.gp-avatars img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin-left: -6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.gp-avatars img:first-child { margin-left: 0; }
+
+.gp-headline {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1d1d1f;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.gp-bar {
+  position: relative;
+  height: 6px;
+  background: #f0f0f3;
+  border-radius: 100px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+.gp-bar-fill {
+  position: absolute;
+  inset: 0 100% 0 0;
+  background: linear-gradient(90deg, #4ade80, #16a34a);
+  border-radius: 100px;
+  animation: bar-fill 12s ease-out infinite;
+}
+@keyframes bar-fill {
+  0%, 44% { right: 100%; }
+  92%, 96% { right: 18%; }
+  100% { right: 100%; }
+}
+.gp-status {
+  font-size: 12px;
+  font-weight: 600;
+  color: #16a34a;
+  letter-spacing: 0.01em;
+}
+
+/* Counter using @property */
+@property --shop-count {
+  syntax: '<integer>';
+  initial-value: 0;
+  inherits: false;
+}
+.gp-count-num {
+  --shop-count: 0;
+  animation: count-up 12s ease-out infinite;
+  counter-reset: shopCount var(--shop-count);
+}
+.gp-count-num::after { content: counter(shopCount); }
+@keyframes count-up {
+  0%, 44% { --shop-count: 0; }
+  92%, 96% { --shop-count: 247; }
+  100% { --shop-count: 0; }
+}
+
+/* ── Launch card: #FAEFDE background, image pinned to bottom-left,
+   animated Setup Complete checklist on the right ── */
+.amzkit-anim-launch {
+  background: #FAEFDE;
+  position: relative;
+  overflow: hidden;
+}
+.amzkit-anim-launch > img {
+  position: absolute;
+  left: 30px;
+  bottom: 0;
+  width: auto;
+  height: 90%;
+  max-width: calc(100% - 30px);
+  object-fit: contain;
+  object-position: bottom left;
+  display: block;
+  will-change: transform;
+  animation: launch-slide-up 8s ease-out infinite;
+}
+/* Start with ~30% of image pushed below (70% visible), then slide smoothly
+   up to its resting position in sync with the checklist reveal */
+@keyframes launch-slide-up {
+  0%, 5%    { transform: translateY(30%); }
+  22%, 92%  { transform: translateY(0); }
+  97%, 100% { transform: translateY(30%); }
+}
+/* Checklist card — floats in the right area, white bg + soft shadow
+   matching the product card in "Tap into 300M ready-to-buy shoppers" */
+.launch-checklist {
+  position: absolute;
+  right: 6%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44%;
+  max-width: 320px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 14px 32px rgba(15, 50, 95, 0.16);
+  padding: 16px 18px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+.lc-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.lc-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #0f1a2c;
+}
+.lc-done-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #22c55e;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0;
+  transform: scale(0.4);
+  animation: lc-badge 8s ease-out infinite;
+}
+.lc-done-badge svg {
+  width: 12px;
+  height: 12px;
+}
+.lc-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.lc-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 4px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  animation-duration: 8s;
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
+  will-change: opacity, max-height, padding;
+}
+.lc-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #f59e0b;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.lc-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #0f1a2c;
+  flex: 1;
+}
+.lc-check {
+  color: #22c55e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.lc-check svg { width: 16px; height: 16px; }
+
+.lc-item-1 { animation-name: lc-item-1-show; }
+.lc-item-2 { animation-name: lc-item-2-show; }
+.lc-item-3 { animation-name: lc-item-3-show; }
+
+/* 8s loop, items appear sequentially (max-height animates so the card
+   itself grows in height as each item reveals), then badge pops, all
+   hold, then reset */
+@keyframes lc-item-1-show {
+  0%, 8%    { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; }
+  13%, 92%  { opacity: 1; max-height: 48px; padding-top: 8px; padding-bottom: 8px; }
+  97%, 100% { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; }
+}
+@keyframes lc-item-2-show {
+  0%, 22%   { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; }
+  27%, 92%  { opacity: 1; max-height: 48px; padding-top: 8px; padding-bottom: 8px; }
+  97%, 100% { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; }
+}
+@keyframes lc-item-3-show {
+  0%, 36%   { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; }
+  41%, 92%  { opacity: 1; max-height: 48px; padding-top: 8px; padding-bottom: 8px; }
+  97%, 100% { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; }
+}
+@keyframes lc-badge {
+  0%, 48%   { opacity: 0; transform: scale(0.4); }
+  53%       { opacity: 1; transform: scale(1.18); }
+  58%, 92%  { opacity: 1; transform: scale(1); }
+  97%, 100% { opacity: 0; transform: scale(0.4); }
+}
+
+/* ── Toolkits card: two images side-by-side, floating vertically (14s loop) ── */
+.amzkit-anim-toolkits {
+  /* New portrait screenshots (917×1545, aspect ≈ 0.594) — override the
+     default 3/2 card aspect with a taller 4/3 so each slot matches the
+     image's actual height. */
+  aspect-ratio: 4/3;
+  background: #FAEFDE;
+  padding: 0 30px;
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  box-sizing: border-box;
+}
+/* Each slot is a sized container so cqh inside = slot height.
+   Image sits absolutely inside at natural aspect, translateY (GPU) pans it. */
+.amzkit-anim-toolkits .toolkit-slot {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  container-type: size;
+}
+.amzkit-anim-toolkits .toolkit-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  display: block;
+  will-change: transform;
+}
+/* Left image (toolkits 1): starts shifted up by 1/4 slot height (top 1/4
+   of image hidden above slot, bottom 3/4 visible), slides down — but
+   stops 15px before full coverage — then returns to start. */
+.amzkit-anim-toolkits .toolkit-left {
+  animation: tk-pan-left 13s ease-in-out infinite;
+}
+/* Right image (toolkits 2): starts shifted down by 1/4 slot height (bottom
+   1/4 of image hidden below slot, top 3/4 visible), slides up and stops
+   15px short of full coverage, returns. */
+.amzkit-anim-toolkits .toolkit-right {
+  animation: tk-pan-right 13s ease-in-out infinite;
+}
+@keyframes tk-pan-left {
+  0%   { transform: translateY(calc(100cqh * -1 / 4)); }
+  50%  { transform: translateY(-15px); }
+  100% { transform: translateY(calc(100cqh * -1 / 4)); }
+}
+@keyframes tk-pan-right {
+  0%   { transform: translateY(calc(100cqh * 1 / 4)); }
+  50%  { transform: translateY(15px); }
+  100% { transform: translateY(calc(100cqh * 1 / 4)); }
+}
+
+@media (max-width: 480px) {
+  .prod-card { width: 70%; max-width: 240px; border-radius: 16px; }
+  .prod-title { font-size: 15px; }
+  .prod-price { font-size: 17px; }
+  .globe-panel { left: 14px; bottom: 14px; width: min(260px, 72%); padding: 12px 14px; border-radius: 14px; }
+  .gp-headline { font-size: 15px; }
+  .gp-avatars img { width: 26px; height: 26px; margin-left: -7px; }
+  .pin-thumb { width: 24px; height: 24px; }
+}
+
+@media (max-width: 1200px) {
+  .amzkit-sec { padding: 100px 72px; }
+  .amzkit-h2 { font-size: 48px; }
+}
+@media (max-width: 860px) {
+  .amzkit-sec { padding: 80px 40px; }
+  .amzkit-grid { grid-template-columns: 1fr; gap: 20px; }
+  .amzkit-h2 { font-size: 40px; }
+  .amzkit-sub { font-size: 19px; }
+  .amzkit-head { margin-bottom: 48px; }
+  .amzkit-body { padding: 28px 30px 34px; }
+  .amzkit-card-h3 { font-size: 24px; }
+}
+@media (max-width: 600px) {
+  .amzkit-sec { padding: 64px 24px; }
+  .amzkit-h2 { font-size: 34px; }
+  .amzkit-sub { font-size: 17px; }
+}
+@media (max-width: 480px) {
+  .amzkit-sec { padding: 56px 16px; }
+  .amzkit-h2 { font-size: 30px; }
+  .amzkit-card { border-radius: 22px; }
+  .amzkit-body { padding: 24px 22px 28px; }
+  .amzkit-card-h3 { font-size: 22px; }
+  .amzkit-card-p { font-size: 16px; }
+}
+</style>
+
+<section class="amzkit-sec" id="amazon-kit">
+  <div class="amzkit-inner">
+    <div class="amzkit-head">
+      <span class="bonus-pill amzkit-pill appear">BONUS · $399 VALUE · FREE</span>
+      <h2 class="amzkit-h2 appear">What's inside your<br>Amazon Seller Kit</h2>
+      <p class="amzkit-sub appear d1">Everything real sellers used to launch, scale and earn — yours free when you start your store today.</p>
+    </div>
+
+    <div class="amzkit-grid">
+      <article class="amzkit-card appear d1">
+        <div class="amzkit-visual amzkit-anim-launch">
+          <img src="img/AmazonKit/amazon_store.png" alt="Amazon seller storefront preview" loading="lazy">
+          <div class="launch-checklist">
+            <div class="lc-header">
+              <span class="lc-title">SETUP COMPLETE</span>
+              <span class="lc-done-badge" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+            </div>
+            <ul class="lc-items">
+              <li class="lc-item lc-item-1">
+                <span class="lc-num">1</span>
+                <span class="lc-text">Create account</span>
+                <span class="lc-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </li>
+              <li class="lc-item lc-item-2">
+                <span class="lc-num">2</span>
+                <span class="lc-text">List your products</span>
+                <span class="lc-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </li>
+              <li class="lc-item lc-item-3">
+                <span class="lc-num">3</span>
+                <span class="lc-text">Store published</span>
+                <span class="lc-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="amzkit-body">
+          <h3 class="amzkit-card-h3">Launch on Amazon in days, not months</h3>
+          <p class="amzkit-card-p">Step-by-step setup walks you from zero to a published seller account — no guesswork, no Amazon paperwork rabbit holes.</p>
+        </div>
+      </article>
+
+      <article class="amzkit-card appear d2">
+        <div class="amzkit-visual amzkit-anim-buyers" aria-label="Pet care guide reaching shoppers worldwide">
+
+          <!-- View A: product card on solid background -->
+          <div class="anim-view view-product">
+            <div class="prod-card">
+              <div class="prod-hero"><img src="img/AmazonKit/dog-guide.jpg" alt=""></div>
+              <div class="prod-info">
+                <div class="prod-title">Dog Care Made Simple</div>
+                <div class="prod-desc">Train, feed and love your pup with confidence.</div>
+                <div class="prod-rating">
+                  <span class="rating-stars" aria-label="5 out of 5 stars">★★★★★</span>
+                  <span class="rating-count">(214 reviews)</span>
+                </div>
+                <div class="prod-price">US $24.00</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- View B: world map + dog pins + floating panel with avatar row -->
+          <div class="anim-view view-globe">
+            <div class="map-bg"></div>
+            <div class="map-pin pin-1"><div class="pin-dot"></div><div class="pin-thumb"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><ellipse cx="6" cy="9" rx="2" ry="2.5"/><ellipse cx="10.5" cy="5.5" rx="2" ry="2.5"/><ellipse cx="13.5" cy="5.5" rx="2" ry="2.5"/><ellipse cx="18" cy="9" rx="2" ry="2.5"/><ellipse cx="12" cy="16.5" rx="5" ry="4.5"/></svg></div></div>
+            <div class="map-pin pin-2"><div class="pin-dot"></div><div class="pin-thumb"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><ellipse cx="6" cy="9" rx="2" ry="2.5"/><ellipse cx="10.5" cy="5.5" rx="2" ry="2.5"/><ellipse cx="13.5" cy="5.5" rx="2" ry="2.5"/><ellipse cx="18" cy="9" rx="2" ry="2.5"/><ellipse cx="12" cy="16.5" rx="5" ry="4.5"/></svg></div></div>
+            <div class="map-pin pin-3"><div class="pin-dot"></div><div class="pin-thumb"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><ellipse cx="6" cy="9" rx="2" ry="2.5"/><ellipse cx="10.5" cy="5.5" rx="2" ry="2.5"/><ellipse cx="13.5" cy="5.5" rx="2" ry="2.5"/><ellipse cx="18" cy="9" rx="2" ry="2.5"/><ellipse cx="12" cy="16.5" rx="5" ry="4.5"/></svg></div></div>
+            <div class="map-pin pin-4"><div class="pin-dot"></div><div class="pin-thumb"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><ellipse cx="6" cy="9" rx="2" ry="2.5"/><ellipse cx="10.5" cy="5.5" rx="2" ry="2.5"/><ellipse cx="13.5" cy="5.5" rx="2" ry="2.5"/><ellipse cx="18" cy="9" rx="2" ry="2.5"/><ellipse cx="12" cy="16.5" rx="5" ry="4.5"/></svg></div></div>
+
+            <div class="globe-panel">
+              <div class="gp-avatars">
+                <img src="img/AmazonKit/avatar-1.jpg" alt="">
+                <img src="img/AmazonKit/avatar-2.jpg" alt="">
+                <img src="img/AmazonKit/avatar-3.jpg" alt="">
+                <img src="img/AmazonKit/avatar-4.jpg" alt="">
+                <img src="img/AmazonKit/avatar-5.jpg" alt="">
+              </div>
+              <div class="gp-headline">Your product just got noticed</div>
+              <div class="gp-bar"><div class="gp-bar-fill"></div></div>
+              <div class="gp-status">+<span class="gp-count-num"></span> shoppers viewed today</div>
+            </div>
+          </div>
+
+        </div>
+        <div class="amzkit-body">
+          <h3 class="amzkit-card-h3">Tap into 300M ready-to-buy shoppers</h3>
+          <p class="amzkit-card-p">Your products land in front of Amazon's existing audience — buyers already in checkout mode. No cold traffic to warm up.</p>
+        </div>
+      </article>
+
+      <article class="amzkit-card appear d3">
+        <div class="amzkit-visual"><img src="img/AmazonKit/revenue.jpg" alt="Earnings dashboard showing month-over-month growth" loading="lazy"></div>
+        <div class="amzkit-body">
+          <h3 class="amzkit-card-h3">Earn from a $514B marketplace</h3>
+          <p class="amzkit-card-p">Get your share of the world's biggest online marketplace. Sellers using our kit see their first sales within weeks.</p>
+        </div>
+      </article>
+
+      <article class="amzkit-card appear d4">
+        <div class="amzkit-visual amzkit-anim-toolkits" aria-label="Sellvia storefront with 100+ AI toolkits">
+          <div class="toolkit-slot toolkit-slot-left">
+            <img class="toolkit-img toolkit-left" src="img/AmazonKit/toolkits 1.png?v=3" alt="Sellvia storefront AI toolkit preview" loading="lazy">
+          </div>
+          <div class="toolkit-slot toolkit-slot-right">
+            <img class="toolkit-img toolkit-right" src="img/AmazonKit/toolkits 2.png?v=3" alt="Sellvia storefront AI toolkit preview" loading="lazy">
+          </div>
+        </div>
+        <div class="amzkit-body">
+          <h3 class="amzkit-card-h3">100+ AI toolkits, already in your store</h3>
+          <p class="amzkit-card-p">Your store opens pre-loaded with our top-converting AI toolkits — listed, designed, priced. Just hit publish and your customers can buy on day one.</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="amzkit-cta appear d4">
+      <a href="https://sellvia.com/checkout/?product=custom&type_custom=free_basic_hosting" class="btn btn-filled">Get my free store + Amazon Kit</a>
+      <p class="amzkit-fine">$399 value · Yours free with any plan</p>
+    </div>
+  </div>
+</section>
+
 <!-- ═══ FINAL CTA ═══ -->
 <section class="final-sec">
   <div class="final-glow"></div>
