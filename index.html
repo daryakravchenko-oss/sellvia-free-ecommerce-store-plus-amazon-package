@@ -2539,6 +2539,98 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   background: #f0f0f3;
   overflow: hidden;
 }
+.amzkit-visual-revenue {
+  aspect-ratio: 4/3;
+  position: relative;
+}
+.revenue-card {
+  position: absolute;
+  left: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42%;
+  max-width: 260px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 14px 32px rgba(15, 50, 95, 0.18);
+  padding: 14px 16px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+.rc-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #0f1a2c;
+  margin-bottom: 4px;
+}
+@property --rc-num {
+  syntax: '<integer>';
+  initial-value: 0;
+  inherits: false;
+}
+.rc-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f1a2c;
+  line-height: 1.1;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+.rc-num {
+  counter-reset: rcn var(--rc-num);
+  animation: rc-count 6s ease-out infinite;
+}
+.rc-num::after {
+  content: "$" counter(rcn);
+}
+@keyframes rc-count {
+  0%        { --rc-num: 0; }
+  35%, 92%  { --rc-num: 8240; }
+  97%, 100% { --rc-num: 0; }
+}
+.rc-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 48px;
+  margin-bottom: 9px;
+}
+.rc-bar {
+  flex: 1;
+  height: 0;
+  border-radius: 3px 3px 2px 2px;
+  background: linear-gradient(to top, #3b82f6 0%, #10b981 100%);
+  animation: rc-bar-grow 6s ease-out infinite;
+}
+.rc-bar-1 { --h: 22%; }
+.rc-bar-2 { --h: 38%; }
+.rc-bar-3 { --h: 32%; }
+.rc-bar-4 { --h: 58%; }
+.rc-bar-5 { --h: 76%; }
+.rc-bar-6 { --h: 96%; }
+@keyframes rc-bar-grow {
+  0%        { height: 0; }
+  35%, 92%  { height: var(--h); }
+  97%, 100% { height: 0; }
+}
+.rc-delta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rc-delta-badge {
+  background: #d1fae5;
+  color: #059669;
+  font-weight: 700;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+.rc-delta-text {
+  color: #6b7280;
+  font-size: 10px;
+}
 .amzkit-visual img {
   width: 100%;
   height: 100%;
@@ -2738,6 +2830,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   height: 14px;
   display: block;
   fill: currentColor;
+}
+.pin-thumb img {
+  width: 92%;
+  height: 92%;
+  display: block;
+  object-fit: contain;
 }
 
 /* Pin positions — pin-1 at zoom origin (appears during close-up), others appear after zoom-out */
@@ -2948,22 +3046,30 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   color: #0f1a2c;
 }
 .lc-done-badge {
-  width: 20px;
-  height: 20px;
+  position: relative;
+  width: 19px;
+  height: 19px;
   border-radius: 50%;
-  background: #22c55e;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: #e5e7eb;
   flex-shrink: 0;
-  opacity: 0;
-  transform: scale(0.4);
-  animation: lc-badge 8s ease-out infinite;
+  animation: lc-badge-fill 8s ease-out infinite;
 }
-.lc-done-badge svg {
-  width: 12px;
-  height: 12px;
+.lc-progress-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+.lc-ring-fg {
+  fill: none;
+  stroke: #22c55e;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: lc-ring-fill 8s ease-out infinite;
 }
 .lc-items {
   list-style: none;
@@ -3033,11 +3139,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   41%, 92%  { opacity: 1; max-height: 48px; padding-top: 8px; padding-bottom: 8px; }
   97%, 100% { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; }
 }
-@keyframes lc-badge {
-  0%, 48%   { opacity: 0; transform: scale(0.4); }
-  53%       { opacity: 1; transform: scale(1.18); }
-  58%, 92%  { opacity: 1; transform: scale(1); }
-  97%, 100% { opacity: 0; transform: scale(0.4); }
+@keyframes lc-ring-fill {
+  0%, 8%    { stroke-dashoffset: 100; }
+  13%, 22%  { stroke-dashoffset: 66.67; }
+  27%, 36%  { stroke-dashoffset: 33.33; }
+  41%, 92%  { stroke-dashoffset: 0; }
+  97%, 100% { stroke-dashoffset: 100; }
+}
+@keyframes lc-badge-fill {
+  0%, 40%   { background: #e5e7eb; }
+  44%, 92%  { background: #22c55e; }
+  97%, 100% { background: #e5e7eb; }
 }
 
 /* ── Toolkits card: two images side-by-side, floating vertically (14s loop) ── */
@@ -3149,7 +3261,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="lc-header">
               <span class="lc-title">SETUP COMPLETE</span>
               <span class="lc-done-badge" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg class="lc-progress-ring" viewBox="0 0 36 36">
+                  <circle class="lc-ring-fg" cx="18" cy="18" r="16" pathLength="100"></circle>
+                </svg>
               </span>
             </div>
             <ul class="lc-items">
@@ -3199,10 +3313,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <!-- View B: world map + dog pins + floating panel with avatar row -->
           <div class="anim-view view-globe">
             <div class="map-bg"></div>
-            <div class="map-pin pin-1"><div class="pin-dot"></div><div class="pin-thumb"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><ellipse cx="6" cy="9" rx="2" ry="2.5"/><ellipse cx="10.5" cy="5.5" rx="2" ry="2.5"/><ellipse cx="13.5" cy="5.5" rx="2" ry="2.5"/><ellipse cx="18" cy="9" rx="2" ry="2.5"/><ellipse cx="12" cy="16.5" rx="5" ry="4.5"/></svg></div></div>
-            <div class="map-pin pin-2"><div class="pin-dot"></div><div class="pin-thumb"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><ellipse cx="6" cy="9" rx="2" ry="2.5"/><ellipse cx="10.5" cy="5.5" rx="2" ry="2.5"/><ellipse cx="13.5" cy="5.5" rx="2" ry="2.5"/><ellipse cx="18" cy="9" rx="2" ry="2.5"/><ellipse cx="12" cy="16.5" rx="5" ry="4.5"/></svg></div></div>
-            <div class="map-pin pin-3"><div class="pin-dot"></div><div class="pin-thumb"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><ellipse cx="6" cy="9" rx="2" ry="2.5"/><ellipse cx="10.5" cy="5.5" rx="2" ry="2.5"/><ellipse cx="13.5" cy="5.5" rx="2" ry="2.5"/><ellipse cx="18" cy="9" rx="2" ry="2.5"/><ellipse cx="12" cy="16.5" rx="5" ry="4.5"/></svg></div></div>
-            <div class="map-pin pin-4"><div class="pin-dot"></div><div class="pin-thumb"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><ellipse cx="6" cy="9" rx="2" ry="2.5"/><ellipse cx="10.5" cy="5.5" rx="2" ry="2.5"/><ellipse cx="13.5" cy="5.5" rx="2" ry="2.5"/><ellipse cx="18" cy="9" rx="2" ry="2.5"/><ellipse cx="12" cy="16.5" rx="5" ry="4.5"/></svg></div></div>
+            <div class="map-pin pin-1"><div class="pin-dot"></div><div class="pin-thumb"><img src="img/AmazonKit/amazon_logo.webp" alt="Amazon" loading="lazy"></div></div>
+            <div class="map-pin pin-2"><div class="pin-dot"></div><div class="pin-thumb"><img src="img/AmazonKit/amazon_logo.webp" alt="Amazon" loading="lazy"></div></div>
+            <div class="map-pin pin-3"><div class="pin-dot"></div><div class="pin-thumb"><img src="img/AmazonKit/amazon_logo.webp" alt="Amazon" loading="lazy"></div></div>
+            <div class="map-pin pin-4"><div class="pin-dot"></div><div class="pin-thumb"><img src="img/AmazonKit/amazon_logo.webp" alt="Amazon" loading="lazy"></div></div>
 
             <div class="globe-panel">
               <div class="gp-avatars">
@@ -3226,7 +3340,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </article>
 
       <article class="amzkit-card appear d3">
-        <div class="amzkit-visual"><img src="img/AmazonKit/revenue.jpg" alt="Earnings dashboard showing month-over-month growth" loading="lazy"></div>
+        <div class="amzkit-visual amzkit-visual-revenue">
+          <img src="img/AmazonKit/revenue-man.jpg" alt="Amazon seller tracking earnings growth at home" loading="lazy">
+          <div class="revenue-card">
+            <div class="rc-title">THIS MONTH'S EARNINGS</div>
+            <div class="rc-value"><span class="rc-num"></span></div>
+            <div class="rc-chart">
+              <span class="rc-bar rc-bar-1"></span>
+              <span class="rc-bar rc-bar-2"></span>
+              <span class="rc-bar rc-bar-3"></span>
+              <span class="rc-bar rc-bar-4"></span>
+              <span class="rc-bar rc-bar-5"></span>
+              <span class="rc-bar rc-bar-6"></span>
+            </div>
+            <div class="rc-delta">
+              <span class="rc-delta-badge">↑ 43%</span>
+              <span class="rc-delta-text">vs last month</span>
+            </div>
+          </div>
+        </div>
         <div class="amzkit-body">
           <h3 class="amzkit-card-h3">Earn from a $514B marketplace</h3>
           <p class="amzkit-card-p">Get your share of the world's biggest online marketplace. Sellers using our kit see their first sales within weeks.</p>
