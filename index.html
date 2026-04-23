@@ -268,22 +268,62 @@ button { cursor: pointer; font-family: var(--font); outline: none; border: none;
   pointer-events: none;
   overflow: hidden;
   border-radius: 24px;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
 }
-.hero-portrait img {
+.hero-portrait > img:not(.hp-amz) {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
   display: block;
 }
+
+/* Circular Amazon badge (already a round image with its own soft edges) */
+.hp-amz {
+  position: absolute;
+  width: 15%;                        /* +15% bigger */
+  aspect-ratio: 1 / 1;
+  left: 20%;
+  top: calc(38% - 30px);             /* raised 30px higher */
+  object-fit: contain;
+  opacity: 0;                        /* starts hidden */
+  animation:
+    amz-in 0.6s ease 1s both,                      /* appears at 1s, rises up */
+    float-card 6s ease-in-out -2s infinite,        /* gentle hover bob */
+    amz-out 0.6s ease 2s forwards;                 /* fades out at 2s, drifts up */
+}
+@keyframes amz-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes amz-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-14px); }
+}
+
+/* RIGHT-side Amazon badge — same timing as the left one */
+.hp-amz-right {
+  left: auto;                      /* override left positioning from .hp-amz */
+  right: 20%;
+  animation:
+    amz-in 0.6s ease 1s both,                     /* appears at 1s, rises up */
+    float-card 6s ease-in-out -3s infinite,       /* gentle hover bob */
+    amz-out 0.6s ease 2s forwards;                /* fades out at 2s, drifts up */
+}
 .hero-portrait-left {
-  left: 3%;
-  top: 28%;
-  width: 300px;
-  aspect-ratio: 3 / 4;
+  left: calc(3% - 50px);
+  top: calc(12% - 50px);
+  width: 760px;
+  aspect-ratio: 1921 / 1432;   /* matches actual image — 4:3-ish landscape */
   animation: float-card 9s ease-in-out infinite;
   animation-delay: -1.5s;
+}
+.hero-portrait-right {
+  right: calc(3% - 50px);
+  top: calc(12% - 50px);
+  width: 760px;
+  aspect-ratio: 1921 / 1432;
+  animation: float-card 10s ease-in-out infinite;
+  animation-delay: -4s;
 }
 
 /* ── Floating glass cards on left/right of hero (framer.com style) ── */
@@ -295,20 +335,53 @@ button { cursor: pointer; font-family: var(--font); outline: none; border: none;
   color: #fff;
 }
 .hero-float-left {
-  left: calc(3% + 180px);   /* overlaps bottom-right of portrait */
-  top: 54%;
-  animation: float-card 7s ease-in-out infinite;
+  left: calc(3% + 330px);   /* 150px shift + overlaps bottom-right of portrait */
+  top: 38%;
+  opacity: 0;               /* hidden until Amazon badge fades out */
+  animation:
+    float-card 7s ease-in-out infinite,
+    fl-in 0.72s ease 2s both;      /* appears at 2s, rises up, stays */
+}
+@keyframes fl-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@property --fade-y {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 24px;
 }
 .hero-float-right {
-  right: 5%;
+  right: calc(5% + 50px);   /* shifted 50px further left */
   top: 50%;
-  transform: translateY(-50%);
-  animation: float-card 8s ease-in-out infinite;
-  animation-delay: -3s;
+  /* centering offset (-50% - 120px) + fade-in offset (24px → 0) — raised 50px */
+  transform: translateY(calc(-50% - 120px + var(--fade-y)));
+  opacity: 0;
+  animation:
+    float-card 8s ease-in-out -3s infinite,
+    fl-in-right 0.72s ease 2s both;
+}
+@keyframes fl-in-right {
+  from { opacity: 0; --fade-y: 24px; }
+  to   { opacity: 1; --fade-y: 0px;  }
 }
 @keyframes float-card {
   0%, 100% { translate: 0 0; }
   50%      { translate: 0 -10px; }
+}
+
+/* At narrower desktops (≤1500px, e.g. 1440 laptops) the 3% side gap shrinks
+   to ~43px — pull portraits + glass cards further inward to keep breathing
+   room from the viewport edges. */
+@media (max-width: 1500px) {
+  /* Shrink portraits and push them outward so the center heading
+     doesn't cover the people. */
+  .hero-portrait-left,
+  .hero-portrait-right { width: 540px; }
+  .hero-portrait-left  { left:  -40px; }
+  .hero-portrait-right { right: -40px; }
+  .hero-float-left     { left:  calc(3% + 140px); }
+  .hero-float-right    { right: calc(5% + 60px); }
 }
 
 /* Matte glass card — common base for all hero-float cards */
@@ -357,21 +430,44 @@ button { cursor: pointer; font-family: var(--font); outline: none; border: none;
   color: #fff;
   letter-spacing: -0.02em;
   line-height: 1;
+  text-align: left;
+  margin-left: -2px;      /* align optical left-edge with the LIVE dot */
   margin-bottom: 2px;
 }
 .hf-snap-sub {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.6);
   margin-bottom: 10px;
+  text-align: left;
+  margin-left: -2px;
 }
 .hf-spark {
   height: 30px;
   opacity: 0.9;
+  overflow: visible;
 }
 .hf-spark svg {
   width: 100%;
   height: 100%;
   display: block;
+  overflow: visible;
+  transform-origin: 0 100%;          /* grow from bottom-left */
+  animation: spark-grow linear both;
+  animation-timeline: scroll(root);
+  animation-range: 0 70vh;
+}
+.hf-spark polyline {
+  animation: spark-color linear both;
+  animation-timeline: scroll(root);
+  animation-range: 0 70vh;
+}
+@keyframes spark-grow {
+  from { transform: scaleY(1); }
+  to   { transform: scaleY(1.5); }
+}
+@keyframes spark-color {
+  from { stroke: #F8A54D; }
+  to   { stroke: #22c55e; }
 }
 
 /* RIGHT: dashboard card with chart */
@@ -417,31 +513,6 @@ button { cursor: pointer; font-family: var(--font); outline: none; border: none;
   height: var(--h, 40%);
   background: linear-gradient(to top, rgba(248, 165, 77, 0.3), #F8A54D);
   border-radius: 3px 3px 2px 2px;
-}
-
-/* Floating Amazon logo card — sits above the dashboard card, slightly offset */
-.hf-logo-card {
-  position: absolute;
-  top: -26px;
-  left: -26px;
-  width: 56px;
-  height: 56px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(18px) saturate(1.4);
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 16px;
-  padding: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  z-index: 3;
-}
-.hf-logo-card img {
-  width: 100%;
-  height: auto;
-  display: block;
 }
 
 /* Hide floating cards on narrow screens so the hero text reads clean */
@@ -1693,7 +1764,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <!-- LEFT: portrait behind the glass snapshot card -->
   <div class="hero-portrait hero-portrait-left" aria-hidden="true">
-    <img src="img/Hero/1.webp" alt="">
+    <img src="img/Hero/1_man.webp" alt="">
+    <img class="hp-amz" src="img/Hero/Amazon_round.webp" alt="">
   </div>
 
   <!-- LEFT: framer-dlsv5 style — glass card with mini stats snapshot -->
@@ -1703,7 +1775,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span class="hf-dot"></span>
         <span class="hf-snap-lbl">Live</span>
       </div>
-      <div class="hf-snap-val">+247</div>
+      <div class="hf-snap-val">$247</div>
       <div class="hf-snap-sub">shoppers today</div>
       <div class="hf-spark">
         <svg viewBox="0 0 100 30" preserveAspectRatio="none">
@@ -1713,11 +1785,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </div>
 
-  <!-- RIGHT: framer-afolnn style — dashboard card with chart + floating Amazon logo -->
+  <!-- RIGHT: portrait behind the glass dashboard card -->
+  <div class="hero-portrait hero-portrait-right" aria-hidden="true">
+    <img src="img/Hero/1_woman.webp" alt="">
+    <img class="hp-amz hp-amz-right" src="img/Hero/Amazon_round.webp" alt="">
+  </div>
+
+  <!-- RIGHT: framer-afolnn style — dashboard card with chart -->
   <div class="hero-float hero-float-right" aria-hidden="true">
-    <div class="hf-logo-card">
-      <img src="img/AmazonKit/amazon_logo.webp" alt="Amazon">
-    </div>
     <div class="hf-card hf-card-dash">
       <div class="hf-dash-head">
         <span class="hf-snap-lbl">Your Amazon store</span>
@@ -1884,7 +1959,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <div class="amzkit-body">
           <h3 class="amzkit-card-h3">100+ AI toolkits, already in your store</h3>
-          <p class="amzkit-card-p">Your store opens pre-loaded with our top-converting AI toolkits — listed, designed, priced. Just hit publish and your customers can buy on day one.</p>
+          <p class="amzkit-card-p">Your store opens pre-loaded with our top-converting AI toolkits — listed, designed, priced. Hit publish and customers can buy on day one.</p>
         </div>
       </article>
     </div>
@@ -3672,20 +3747,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
    Desktop (hover-capable): animations run only while card is hovered
    Mobile (no hover): animations run while card is in viewport (JS toggles .amzkit-active)
    A static preview image (the "final/filled" screenshot) covers the live
-   animation by default and fades out on hover / .amzkit-active. */
+   animation by default and fades out on hover / .amzkit-active.
+   !important is required because many descendant rules use the `animation`
+   shorthand, which implicitly resets `animation-play-state` to `running`.
+   Without !important the shorthand declaration (same specificity tier,
+   earlier in the file) can win in some browsers' cascade paths. */
 .amzkit-grid .amzkit-card .amzkit-visual,
-.amzkit-grid .amzkit-card .amzkit-visual * {
-  animation-play-state: paused;
+.amzkit-grid .amzkit-card .amzkit-visual *,
+.amzkit-grid .amzkit-card .amzkit-visual *::before,
+.amzkit-grid .amzkit-card .amzkit-visual *::after {
+  animation-play-state: paused !important;
 }
 .amzkit-grid .amzkit-card .amzkit-preview {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top center;
-  display: block;
-  z-index: 20;
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: top center !important;
+  display: block !important;
+  z-index: 20 !important;
   pointer-events: none;
   opacity: 1;
   transition: opacity 0.25s ease;
@@ -3694,19 +3775,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   .amzkit-grid .amzkit-card:hover .amzkit-preview {
     opacity: 0;
   }
+  .amzkit-grid .amzkit-card:hover .amzkit-visual,
+  .amzkit-grid .amzkit-card:hover .amzkit-visual *,
+  .amzkit-grid .amzkit-card:hover .amzkit-visual *::before,
+  .amzkit-grid .amzkit-card:hover .amzkit-visual *::after {
+    animation-play-state: running !important;
+  }
 }
 .amzkit-grid .amzkit-card.amzkit-active .amzkit-preview {
   opacity: 0;
 }
-@media (hover: hover) {
-  .amzkit-grid .amzkit-card:hover .amzkit-visual,
-  .amzkit-grid .amzkit-card:hover .amzkit-visual * {
-    animation-play-state: running;
-  }
-}
 .amzkit-grid .amzkit-card.amzkit-active .amzkit-visual,
-.amzkit-grid .amzkit-card.amzkit-active .amzkit-visual * {
-  animation-play-state: running;
+.amzkit-grid .amzkit-card.amzkit-active .amzkit-visual *,
+.amzkit-grid .amzkit-card.amzkit-active .amzkit-visual *::before,
+.amzkit-grid .amzkit-card.amzkit-active .amzkit-visual *::after {
+  animation-play-state: running !important;
 }
 
 @media (max-width: 1200px) {
