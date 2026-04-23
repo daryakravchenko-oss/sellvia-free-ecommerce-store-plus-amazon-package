@@ -178,45 +178,276 @@ button { cursor: pointer; font-family: var(--font); outline: none; border: none;
 /* ════ HERO ════ */
 /* Apple-style hero: full viewport, centered text, image below (or behind with overlay) */
 .hero {
-  background: #000;
+  background: linear-gradient(180deg, #1d1d1f 0%, #0f0f10 100%);
   min-height: 80svh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative;
+  position: sticky;
+  top: 0;
+  /* no z-index: we don't want hero to create a stacking context — otherwise
+     it would overlay later sections (awards/why/etc.) whose z-index is auto.
+     amzkit-sec (z:10) and stat-bar (z:20) still stack above hero via their
+     own explicit z-index. */
   overflow: hidden;
   text-align: center;
-  padding: 48px 24px 44px;
+  /* Extended bottom padding gives a "dead zone" of scroll (~500px, about
+     5 wheel clicks) where hero is sticky and amzkit-sec is still below
+     viewport — position of amzkit-sec visually doesn't change yet. */
+  padding: 48px 24px 644px;
 }
-/* Slideshow */
-.hero-slides { position: absolute; inset: 0; z-index: 0; }
-.hero-slide {
-  position: absolute; inset: 0;
-  background-size: cover;
-  background-position: 70% center;
-  background-repeat: no-repeat;
-  background-color: #000;
-  opacity: 0;
-  transform: scale(1.12);
-  transition: opacity 1.2s cubic-bezier(0.25,0.1,0.25,1), transform 8s ease-out;
-}
-.hero-slide.active { opacity: 1; transform: scale(1); }
-.hero-slide:nth-child(1) { background-image: url('img/Hero/2158.webp'); }
-.hero-slide:nth-child(2) { background-image: url('img/Hero/2162.webp'); background-position: right center; }
-.hero-slide:nth-child(3) { background-image: url('img/Hero/2163.webp'); background-position: left center; }
-.hero-slide:nth-child(4) { background-image: url('img/Hero/2161.webp'); background-position: 65% 15%; }
-/* 40% black overlay + bottom fade */
-.hero-overlay {
-  position: absolute; inset: 0;
-  background: rgba(0,0,0,0.40);
-  z-index: 1;
-}
-.hero-overlay::after {
-  content: '';
+/* Animated edge glows — very blurred orange blobs at left & right edges
+   that gently pulse in/out opacity; center stays dark so the H1 reads clean */
+.hero-glows {
   position: absolute;
-  bottom: 0; left: 0; right: 0; height: 55%;
-  background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%);
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.hero-glow {
+  position: absolute;
+  width: 32%;
+  height: 70%;
+  top: 15%;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0;
+  will-change: opacity, transform;
+}
+/* Orange glows — left & right edge, appear & fade on their own cycle */
+.glow-left {
+  left: -12%;
+  background: #F8A54D;
+  animation: glow-pulse-left 10s ease-in-out infinite;
+}
+.glow-right {
+  right: -12%;
+  background: #F8A54D;
+  animation: glow-pulse-right 12s ease-in-out infinite;
+  animation-delay: -6s;
+}
+/* Dark glows — offset from the orange ones (different position + different
+   timing), pulse in opposite seconds so something is always fading in/out */
+.glow-dark-left {
+  left: -16%;
+  top: 32%;
+  background: #000;
+  animation: glow-pulse-dark-left 11s ease-in-out infinite;
+  animation-delay: -5s;
+}
+.glow-dark-right {
+  right: -16%;
+  top: 32%;
+  background: #000;
+  animation: glow-pulse-dark-right 13s ease-in-out infinite;
+  animation-delay: -3s;
+}
+@keyframes glow-pulse-left {
+  0%, 100% { opacity: 0;    transform: translateY(0)    scale(1); }
+  50%      { opacity: 0.55; transform: translateY(30px) scale(1.08); }
+}
+@keyframes glow-pulse-right {
+  0%, 100% { opacity: 0;    transform: translateY(0)     scale(1); }
+  50%      { opacity: 0.55; transform: translateY(-30px) scale(1.08); }
+}
+@keyframes glow-pulse-dark-left {
+  0%, 100% { opacity: 0;   transform: translateY(0)     scale(1); }
+  50%      { opacity: 0.6; transform: translateY(-25px) scale(1.1); }
+}
+@keyframes glow-pulse-dark-right {
+  0%, 100% { opacity: 0;   transform: translateY(0)    scale(1); }
+  50%      { opacity: 0.6; transform: translateY(25px) scale(1.1); }
+}
+
+/* ── Portraits behind the floating glass cards ── */
+.hero-portrait {
+  position: absolute;
+  z-index: 1;            /* below .hero-float (z-index:2) so glass card overlaps */
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 24px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+.hero-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+.hero-portrait-left {
+  left: 3%;
+  top: 28%;
+  width: 300px;
+  aspect-ratio: 3 / 4;
+  animation: float-card 9s ease-in-out infinite;
+  animation-delay: -1.5s;
+}
+
+/* ── Floating glass cards on left/right of hero (framer.com style) ── */
+.hero-float {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  font-family: var(--font);
+  color: #fff;
+}
+.hero-float-left {
+  left: calc(3% + 180px);   /* overlaps bottom-right of portrait */
+  top: 54%;
+  animation: float-card 7s ease-in-out infinite;
+}
+.hero-float-right {
+  right: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: float-card 8s ease-in-out infinite;
+  animation-delay: -3s;
+}
+@keyframes float-card {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -10px; }
+}
+
+/* Matte glass card — common base for all hero-float cards */
+.hf-card {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(22px) saturate(1.4);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 18px 20px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* LEFT: snapshot card */
+.hf-card-snap {
+  width: 180px;
+}
+.hf-snap-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.hf-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+  animation: hf-pulse 1.6s ease-in-out infinite;
+}
+@keyframes hf-pulse {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(0.85); }
+}
+.hf-snap-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.7);
+}
+.hf-snap-val {
+  font-size: 32px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.hf-snap-sub {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 10px;
+}
+.hf-spark {
+  height: 30px;
+  opacity: 0.9;
+}
+.hf-spark svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* RIGHT: dashboard card with chart */
+.hf-card-dash {
+  width: 240px;
+}
+.hf-dash-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.hf-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.14);
+  padding: 3px 8px;
+  border-radius: 8px;
+  letter-spacing: 0.02em;
+}
+.hf-dash-val {
+  font-size: 30px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.hf-dash-sub {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 4px;
+  margin-bottom: 12px;
+}
+.hf-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 54px;
+}
+.hf-bar {
+  flex: 1;
+  height: var(--h, 40%);
+  background: linear-gradient(to top, rgba(248, 165, 77, 0.3), #F8A54D);
+  border-radius: 3px 3px 2px 2px;
+}
+
+/* Floating Amazon logo card — sits above the dashboard card, slightly offset */
+.hf-logo-card {
+  position: absolute;
+  top: -26px;
+  left: -26px;
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 3;
+}
+.hf-logo-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Hide floating cards on narrow screens so the hero text reads clean */
+@media (max-width: 960px) {
+  .hero-float,
+  .hero-portrait { display: none; }
 }
  }
 .hero-bg::after {
@@ -350,6 +581,10 @@ button { cursor: pointer; font-family: var(--font); outline: none; border: none;
 .stat-bar {
   background: #1d1d1f;
   padding: 40px 24px;
+  /* Slight overlap with amzkit-sec for a smooth hand-off */
+  position: relative;
+  z-index: 20;
+  margin-top: -50px;
 }
 .stat-bar-inner {
   max-width: var(--max);
@@ -458,7 +693,7 @@ section { padding: 120px 24px; }
 
 /* ════ SECTION 1: WHY ════ */
 /* Apple-style: light bg, 3 features in a row */
-.why-sec { background: #f5f5f7; text-align: center; }
+.why-sec { background: #f5f5f7; text-align: center; position: relative; }
 .why-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -501,7 +736,7 @@ section { padding: 120px 24px; }
 }
 
 /* ════ SECTION 2: WHAT WILL I SELL (scroll-pinned) ════ */
-.sell-sec { background: #000; }
+.sell-sec { background: #000; position: relative; }
 .sell-sec .sec-title-xl { color: #fff; }
 .sell-sec .sec-body { color: rgba(255,255,255,0.6); }
 
@@ -601,7 +836,7 @@ section { padding: 120px 24px; }
 @media(max-width:760px) { .prod-card { flex: 0 0 220px; } }
 
 /* ════ SECTION 3: HOW IT WORKS ════ */
-.how-sec { background: var(--c-lightbg); }
+.how-sec { background: var(--c-lightbg); position: relative; }
 .how-steps {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -822,7 +1057,7 @@ section { padding: 120px 24px; }
 }
 
 /* ════ AWARDS ════ */
-.awards-sec { background: var(--c-lightbg); text-align: center; }
+.awards-sec { background: var(--c-lightbg); text-align: center; position: relative; }
 .awards-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -976,7 +1211,7 @@ section { padding: 120px 24px; }
 }
 
 /* ════ TESTIMONIALS ════ */
-.test-sec { background: var(--c-lightbg); }
+.test-sec { background: var(--c-lightbg); position: relative; }
 .test-sec .sec-label { text-align: center; }
 .test-sec .sec-title-lg { color: var(--c-near); text-align: center; }
 .test-grid {
@@ -1043,7 +1278,7 @@ section { padding: 120px 24px; }
 @media(max-width:520px) { .test-grid { grid-template-columns: 1fr; } }
 
 /* ════ FAQ ════ */
-.faq-sec { background: #000; }
+.faq-sec { background: #000; position: relative; }
 .faq-sec .sec-title-lg { color: #fff; }
 .faq-layout { display: grid; grid-template-columns: 60fr 40fr; gap: 80px; margin-top: 72px; }
 .faq-list { display: flex; flex-direction: column; }
@@ -1448,15 +1683,58 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- ═══ HERO ═══ -->
 <section class="hero" id="hero">
-  <!-- Slideshow backgrounds -->
-  <div class="hero-slides">
-    <div class="hero-slide active"></div>
-    <div class="hero-slide"></div>
-    <div class="hero-slide"></div>
-    <div class="hero-slide"></div>
+  <!-- Edge glows — orange + dark blurred blobs pulsing out of phase at left & right -->
+  <div class="hero-glows" aria-hidden="true">
+    <span class="hero-glow glow-left"></span>
+    <span class="hero-glow glow-right"></span>
+    <span class="hero-glow glow-dark-left"></span>
+    <span class="hero-glow glow-dark-right"></span>
   </div>
-  <!-- 40% dark overlay -->
-  <div class="hero-overlay"></div>
+
+  <!-- LEFT: portrait behind the glass snapshot card -->
+  <div class="hero-portrait hero-portrait-left" aria-hidden="true">
+    <img src="img/Hero/1.webp" alt="">
+  </div>
+
+  <!-- LEFT: framer-dlsv5 style — glass card with mini stats snapshot -->
+  <div class="hero-float hero-float-left" aria-hidden="true">
+    <div class="hf-card hf-card-snap">
+      <div class="hf-snap-head">
+        <span class="hf-dot"></span>
+        <span class="hf-snap-lbl">Live</span>
+      </div>
+      <div class="hf-snap-val">+247</div>
+      <div class="hf-snap-sub">shoppers today</div>
+      <div class="hf-spark">
+        <svg viewBox="0 0 100 30" preserveAspectRatio="none">
+          <polyline points="0,22 12,18 24,20 36,14 48,16 60,8 72,10 84,4 100,6" fill="none" stroke="#F8A54D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: framer-afolnn style — dashboard card with chart + floating Amazon logo -->
+  <div class="hero-float hero-float-right" aria-hidden="true">
+    <div class="hf-logo-card">
+      <img src="img/AmazonKit/amazon_logo.webp" alt="Amazon">
+    </div>
+    <div class="hf-card hf-card-dash">
+      <div class="hf-dash-head">
+        <span class="hf-snap-lbl">Your Amazon store</span>
+        <span class="hf-badge">↑ 43%</span>
+      </div>
+      <div class="hf-dash-val">$8,240</div>
+      <div class="hf-dash-sub">earned this month</div>
+      <div class="hf-chart">
+        <span class="hf-bar" style="--h: 22%"></span>
+        <span class="hf-bar" style="--h: 38%"></span>
+        <span class="hf-bar" style="--h: 32%"></span>
+        <span class="hf-bar" style="--h: 58%"></span>
+        <span class="hf-bar" style="--h: 76%"></span>
+        <span class="hf-bar" style="--h: 96%"></span>
+      </div>
+    </div>
+  </div>
   <div class="hero-inner">
     <p class="hero-eyebrow">Free for 14 days · No experience needed</p>
     <h1 class="hero-h1">Start your<br>online business<br>for <em>FREE</em> today.</h1>
@@ -1468,6 +1746,153 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
   <div class="hero-scroll-hint">
     <div class="scroll-chevron"></div>
+  </div>
+</section>
+
+<section class="amzkit-sec" id="amazon-kit">
+  <div class="amzkit-inner">
+    <div class="amzkit-head">
+      <span class="bonus-pill amzkit-pill appear">BONUS · $399 VALUE · FREE</span>
+      <h2 class="amzkit-h2 appear">What's inside your<br>Amazon Seller Kit</h2>
+      <p class="amzkit-sub appear d1">Everything real sellers used to launch, scale and earn — yours free when you start your store today.</p>
+    </div>
+
+    <div class="amzkit-grid">
+      <article class="amzkit-card appear d1">
+        <div class="amzkit-visual amzkit-anim-launch">
+          <img class="amzkit-preview" src="img/AmazonKit/Launch.webp?v=2" alt="" aria-hidden="true" loading="lazy">
+          <img src="img/AmazonKit/amazon_store.png" alt="Amazon seller storefront preview" loading="lazy">
+          <div class="launch-checklist">
+            <div class="lc-header">
+              <span class="lc-title">SETUP COMPLETE</span>
+              <span class="lc-done-badge" aria-hidden="true">
+                <svg class="lc-progress-ring" viewBox="0 0 36 36">
+                  <circle class="lc-ring-fg" cx="18" cy="18" r="16" pathLength="100"></circle>
+                </svg>
+              </span>
+            </div>
+            <ul class="lc-items">
+              <li class="lc-item lc-item-1">
+                <span class="lc-num">1</span>
+                <span class="lc-text">Create account</span>
+                <span class="lc-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </li>
+              <li class="lc-item lc-item-2">
+                <span class="lc-num">2</span>
+                <span class="lc-text">List your products</span>
+                <span class="lc-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </li>
+              <li class="lc-item lc-item-3">
+                <span class="lc-num">3</span>
+                <span class="lc-text">Store published</span>
+                <span class="lc-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="amzkit-body">
+          <h3 class="amzkit-card-h3">Launch on Amazon in days, not months</h3>
+          <p class="amzkit-card-p">Step-by-step setup walks you from zero to a published seller account — no guesswork, no Amazon paperwork rabbit holes.</p>
+        </div>
+      </article>
+
+      <article class="amzkit-card appear d2">
+        <div class="amzkit-visual amzkit-anim-buyers" aria-label="Pet care guide reaching shoppers worldwide">
+          <img class="amzkit-preview" src="img/AmazonKit/Buyers.webp?v=2" alt="" aria-hidden="true" loading="lazy">
+
+          <!-- View A: product card on solid background -->
+          <div class="anim-view view-product">
+            <div class="prod-card">
+              <div class="prod-hero"><img src="img/AmazonKit/dog-guide.jpg" alt=""></div>
+              <div class="prod-info">
+                <div class="prod-title">Dog Care Made Simple</div>
+                <div class="prod-desc">Train, feed and love your pup with confidence.</div>
+                <div class="prod-rating">
+                  <span class="rating-stars" aria-label="5 out of 5 stars">★★★★★</span>
+                  <span class="rating-count">(214 reviews)</span>
+                </div>
+                <div class="prod-price">US $24.00</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- View B: world map + dog pins + floating panel with avatar row -->
+          <div class="anim-view view-globe">
+            <div class="map-bg"></div>
+            <div class="map-pin pin-1"><div class="pin-dot"></div><div class="pin-thumb"><img src="img/AmazonKit/amazon_logo.webp" alt="Amazon" loading="lazy"></div></div>
+            <div class="map-pin pin-2"><div class="pin-dot"></div><div class="pin-thumb"><img src="img/AmazonKit/amazon_logo.webp" alt="Amazon" loading="lazy"></div></div>
+            <div class="map-pin pin-3"><div class="pin-dot"></div><div class="pin-thumb"><img src="img/AmazonKit/amazon_logo.webp" alt="Amazon" loading="lazy"></div></div>
+            <div class="map-pin pin-4"><div class="pin-dot"></div><div class="pin-thumb"><img src="img/AmazonKit/amazon_logo.webp" alt="Amazon" loading="lazy"></div></div>
+
+            <div class="globe-panel">
+              <div class="gp-avatars">
+                <img src="img/AmazonKit/avatar-1.jpg" alt="">
+                <img src="img/AmazonKit/avatar-2.jpg" alt="">
+                <img src="img/AmazonKit/avatar-3.jpg" alt="">
+                <img src="img/AmazonKit/avatar-4.jpg" alt="">
+                <img src="img/AmazonKit/avatar-5.jpg" alt="">
+              </div>
+              <div class="gp-headline">Your product just got noticed</div>
+              <div class="gp-bar"><div class="gp-bar-fill"></div></div>
+              <div class="gp-status">+<span class="gp-count-num"></span> shoppers viewed today</div>
+            </div>
+          </div>
+
+        </div>
+        <div class="amzkit-body">
+          <h3 class="amzkit-card-h3">Tap into 300M ready-to-buy shoppers</h3>
+          <p class="amzkit-card-p">Your products land in front of Amazon's existing audience — buyers already in checkout mode. No cold traffic to warm up.</p>
+        </div>
+      </article>
+
+      <article class="amzkit-card appear d3">
+        <div class="amzkit-visual amzkit-visual-revenue">
+          <img class="amzkit-preview" src="img/AmazonKit/Revenue.webp?v=3" alt="" aria-hidden="true" loading="lazy">
+          <img src="img/AmazonKit/revenue-man.jpg" alt="Amazon seller tracking earnings growth at home" loading="lazy">
+          <div class="revenue-card">
+            <div class="rc-title">This month's earnings</div>
+            <div class="rc-value"><span class="rc-num"></span></div>
+            <div class="rc-chart">
+              <span class="rc-bar rc-bar-1"></span>
+              <span class="rc-bar rc-bar-2"></span>
+              <span class="rc-bar rc-bar-3"></span>
+              <span class="rc-bar rc-bar-4"></span>
+              <span class="rc-bar rc-bar-5"></span>
+              <span class="rc-bar rc-bar-6"></span>
+            </div>
+            <div class="rc-delta">
+              <span class="rc-delta-badge">↑ 43%</span>
+              <span class="rc-delta-text">vs last month</span>
+            </div>
+          </div>
+        </div>
+        <div class="amzkit-body">
+          <h3 class="amzkit-card-h3">Earn from a $514B marketplace</h3>
+          <p class="amzkit-card-p">Get your share of the world's biggest online marketplace. Sellers using our kit see their first sales within weeks.</p>
+        </div>
+      </article>
+
+      <article class="amzkit-card appear d4">
+        <div class="amzkit-visual amzkit-anim-toolkits" aria-label="Sellvia storefront with 100+ AI toolkits">
+          <img class="amzkit-preview" src="img/AmazonKit/Toolkits.webp?v=3" alt="" aria-hidden="true" loading="lazy">
+          <div class="toolkit-slot toolkit-slot-left">
+            <img class="toolkit-img toolkit-left" src="img/AmazonKit/toolkits 1.png?v=3" alt="Sellvia storefront AI toolkit preview" loading="lazy">
+          </div>
+          <div class="toolkit-slot toolkit-slot-right">
+            <img class="toolkit-img toolkit-right" src="img/AmazonKit/toolkits 2.png?v=3" alt="Sellvia storefront AI toolkit preview" loading="lazy">
+          </div>
+        </div>
+        <div class="amzkit-body">
+          <h3 class="amzkit-card-h3">100+ AI toolkits, already in your store</h3>
+          <p class="amzkit-card-p">Your store opens pre-loaded with our top-converting AI toolkits — listed, designed, priced. Just hit publish and your customers can buy on day one.</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="amzkit-cta appear d4">
+      <a href="https://sellvia.com/checkout/?product=custom&type_custom=free_basic_hosting" class="btn btn-filled">Get my free store + Amazon Kit</a>
+      <p class="amzkit-fine">$399 value · Yours free with any plan</p>
+    </div>
   </div>
 </section>
 
@@ -1755,6 +2180,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   background: #f5f5f7;
   padding: 120px 24px;
   width: 100%;
+  position: relative;
 }
 
 .bonus-inner {
@@ -2489,6 +2915,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   background: var(--c-lightbg);
   padding: 120px 100px;
   font-family: var(--font);
+  border-radius: 48px 48px 0 0;
+  position: relative;
+  z-index: 10;
+  /* Negative margin-top creates the scroll-jacking overlap with hero */
+  margin-top: -50px;
 }
 .amzkit-inner {
   max-width: 1200px;
@@ -2538,70 +2969,91 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   aspect-ratio: 3/2;
   background: #f0f0f3;
   overflow: hidden;
+  position: relative;
 }
 .amzkit-visual-revenue {
-  aspect-ratio: 4/3;
+  /* aspect-ratio inherits 3/2 from .amzkit-visual to match the preview */
   position: relative;
 }
 .revenue-card {
   position: absolute;
   left: 5%;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 44%;
+  transform: translateY(calc(-50% - 15px));
   width: 42%;
   max-width: 260px;
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 14px 32px rgba(15, 50, 95, 0.18);
-  padding: 14px 16px;
+  padding: 26px 16px 27px;
   box-sizing: border-box;
   font-family: inherit;
 }
 .rc-title {
-  font-size: 10px;
+  font-size: 16px;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  color: #0f1a2c;
+  letter-spacing: -0.01em;
+  color: #1d1d1f;
+  line-height: 1.2;
   margin-bottom: 4px;
 }
-@property --rc-num {
+@counter-style rc-pad3 {
+  system: extends decimal;
+  pad: 3 '0';
+}
+@property --rc-k {
+  syntax: '<integer>';
+  initial-value: 0;
+  inherits: false;
+}
+@property --rc-r {
   syntax: '<integer>';
   initial-value: 0;
   inherits: false;
 }
 .rc-value {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 800;
   color: #0f1a2c;
   line-height: 1.1;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
   letter-spacing: -0.02em;
 }
 .rc-num {
-  counter-reset: rcn var(--rc-num);
-  animation: rc-count 6s ease-out infinite;
+  counter-reset: rck var(--rc-k) rcr var(--rc-r);
+  animation: rc-count-k 6s ease-out infinite,
+             rc-count-r 6s ease-out infinite;
 }
 .rc-num::after {
-  content: "$" counter(rcn);
+  content: "$" counter(rck) "," counter(rcr, rc-pad3);
 }
-@keyframes rc-count {
-  0%        { --rc-num: 0; }
-  35%, 92%  { --rc-num: 8240; }
-  97%, 100% { --rc-num: 0; }
+@keyframes rc-count-k {
+  0%        { --rc-k: 0; }
+  35%, 92%  { --rc-k: 8; }
+  97%, 100% { --rc-k: 0; }
+}
+@keyframes rc-count-r {
+  0%        { --rc-r: 0; }
+  35%, 92%  { --rc-r: 240; }
+  97%, 100% { --rc-r: 0; }
 }
 .rc-chart {
   display: flex;
   align-items: flex-end;
   gap: 5px;
-  height: 48px;
+  height: 58px;
   margin-bottom: 9px;
+  overflow: hidden;
 }
 .rc-bar {
   flex: 1;
   height: 0;
+  min-height: 0;
   border-radius: 3px 3px 2px 2px;
-  background: linear-gradient(to top, #3b82f6 0%, #10b981 100%);
+  background: linear-gradient(to top, #CFE6F5 0%, #d1fae5 100%);
   animation: rc-bar-grow 6s ease-out infinite;
+  will-change: height;
+  transform-origin: bottom;
 }
 .rc-bar-1 { --h: 22%; }
 .rc-bar-2 { --h: 38%; }
@@ -2623,13 +3075,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   background: #d1fae5;
   color: #059669;
   font-weight: 700;
-  font-size: 10px;
-  padding: 2px 6px;
+  font-size: 11px;
+  padding: 4px 6px;
   border-radius: 5px;
 }
 .rc-delta-text {
-  color: #6b7280;
-  font-size: 10px;
+  font-size: 12px;
+  color: #6e6e73;
+  line-height: 1.35;
 }
 .amzkit-visual img {
   width: 100%;
@@ -2666,7 +3119,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   color: var(--c-gray3);
 }
 
-/* ── Buyers card: product → world map crossfade (12s loop, Shopify-style) ── */
+/* ── Buyers card: product → world map crossfade (8.16s loop, Shopify-style) ── */
 .amzkit-anim-buyers {
   background: #eaf3fb;
   position: relative;
@@ -2686,11 +3139,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   align-items: center;
   justify-content: center;
   padding: 10px 0;
-  animation: viewA-fade 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: viewA-fade 8.16s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 .view-globe {
   background: #eaf3fb;
-  animation: viewB-fade 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: viewB-fade 8.16s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 .map-bg {
   position: absolute;
@@ -2698,7 +3151,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   background: url('img/AmazonKit/world-map.jpg') center/cover no-repeat;
   transform: scale(2);
   transform-origin: 22% 38%;
-  animation: map-zoom 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: map-zoom 8.16s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   z-index: 0;
 }
 @keyframes map-zoom {
@@ -2709,13 +3162,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 @keyframes viewA-fade {
   0% { opacity: 0; transform: translateY(8px); }
-  3%, 38% { opacity: 1; transform: translateY(0); }
-  44%, 96% { opacity: 0; transform: translateY(-8px); }
+  3%, 21% { opacity: 1; transform: translateY(0); }
+  27%, 96% { opacity: 0; transform: translateY(-8px); }
   100% { opacity: 0; transform: translateY(8px); }
 }
 @keyframes viewB-fade {
-  0%, 38% { opacity: 0; transform: translateY(8px); }
-  44%, 94% { opacity: 1; transform: translateY(0); }
+  0%, 21% { opacity: 0; transform: translateY(8px); }
+  27%, 94% { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(-8px); }
 }
 
@@ -2839,15 +3292,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 }
 
 /* Pin positions — pin-1 at zoom origin (appears during close-up), others appear after zoom-out */
-.pin-1 { top: 38%; left: 22%; z-index: 1; animation: pin-1-show 12s ease-in-out infinite; }
-.pin-2 { top: 30%; left: 50%; z-index: 1; animation: pin-2-show 12s ease-in-out infinite; }
-.pin-3 { top: 46%; left: 70%; z-index: 1; animation: pin-3-show 12s ease-in-out infinite; }
-.pin-4 { top: 30%; left: 16%; z-index: 1; animation: pin-4-show 12s ease-in-out infinite; }
+.pin-1 { top: 38%; left: 22%; z-index: 1; animation: pin-1-show 8.16s ease-in-out infinite; }
+.pin-2 { top: 30%; left: 50%; z-index: 1; animation: pin-2-show 8.16s ease-in-out infinite; }
+.pin-3 { top: 46%; left: 70%; z-index: 1; animation: pin-3-show 8.16s ease-in-out infinite; }
+.pin-4 { top: 30%; left: 16%; z-index: 1; animation: pin-4-show 8.16s ease-in-out infinite; }
 
-.pin-1 .pin-thumb { animation: thumb-1-pop 12s ease-in-out infinite; }
-.pin-2 .pin-thumb { animation: thumb-2-pop 12s ease-in-out infinite; }
-.pin-3 .pin-thumb { animation: thumb-3-pop 12s ease-in-out infinite; }
-.pin-4 .pin-thumb { animation: thumb-4-pop 12s ease-in-out infinite; }
+.pin-1 .pin-thumb { animation: thumb-1-pop 8.16s ease-in-out infinite; }
+.pin-2 .pin-thumb { animation: thumb-2-pop 8.16s ease-in-out infinite; }
+.pin-3 .pin-thumb { animation: thumb-3-pop 8.16s ease-in-out infinite; }
+.pin-4 .pin-thumb { animation: thumb-4-pop 8.16s ease-in-out infinite; }
 
 .pin-1 .pin-dot { animation: dot-pulse 2.4s ease-out infinite; }
 .pin-2 .pin-dot { animation: dot-pulse 2.4s ease-out infinite 0.3s; }
@@ -2958,7 +3411,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   inset: 0 100% 0 0;
   background: linear-gradient(90deg, #4ade80, #16a34a);
   border-radius: 100px;
-  animation: bar-fill 12s ease-out infinite;
+  animation: bar-fill 8.16s ease-out infinite;
 }
 @keyframes bar-fill {
   0%, 44% { right: 100%; }
@@ -2980,7 +3433,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 }
 .gp-count-num {
   --shop-count: 0;
-  animation: count-up 12s ease-out infinite;
+  animation: count-up 8.16s ease-out infinite;
   counter-reset: shopCount var(--shop-count);
 }
 .gp-count-num::after { content: counter(shopCount); }
@@ -2997,7 +3450,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   position: relative;
   overflow: hidden;
 }
-.amzkit-anim-launch > img {
+.amzkit-anim-launch > img:not(.amzkit-preview) {
   position: absolute;
   left: 30px;
   bottom: 0;
@@ -3154,10 +3607,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 /* ── Toolkits card: two images side-by-side, floating vertically (14s loop) ── */
 .amzkit-anim-toolkits {
-  /* New portrait screenshots (917×1545, aspect ≈ 0.594) — override the
-     default 3/2 card aspect with a taller 4/3 so each slot matches the
-     image's actual height. */
-  aspect-ratio: 4/3;
+  /* aspect-ratio inherits 3/2 from .amzkit-visual to match the 806×537
+     preview — the div is cropped from the bottom. */
   background: #FAEFDE;
   padding: 0 30px;
   display: flex;
@@ -3217,6 +3668,47 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   .pin-thumb { width: 24px; height: 24px; }
 }
 
+/* ── Amzkit cards: pause inner animations until interaction ──
+   Desktop (hover-capable): animations run only while card is hovered
+   Mobile (no hover): animations run while card is in viewport (JS toggles .amzkit-active)
+   A static preview image (the "final/filled" screenshot) covers the live
+   animation by default and fades out on hover / .amzkit-active. */
+.amzkit-grid .amzkit-card .amzkit-visual,
+.amzkit-grid .amzkit-card .amzkit-visual * {
+  animation-play-state: paused;
+}
+.amzkit-grid .amzkit-card .amzkit-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+@media (hover: hover) {
+  .amzkit-grid .amzkit-card:hover .amzkit-preview {
+    opacity: 0;
+  }
+}
+.amzkit-grid .amzkit-card.amzkit-active .amzkit-preview {
+  opacity: 0;
+}
+@media (hover: hover) {
+  .amzkit-grid .amzkit-card:hover .amzkit-visual,
+  .amzkit-grid .amzkit-card:hover .amzkit-visual * {
+    animation-play-state: running;
+  }
+}
+.amzkit-grid .amzkit-card.amzkit-active .amzkit-visual,
+.amzkit-grid .amzkit-card.amzkit-active .amzkit-visual * {
+  animation-play-state: running;
+}
+
 @media (max-width: 1200px) {
   .amzkit-sec { padding: 100px 72px; }
   .amzkit-h2 { font-size: 48px; }
@@ -3236,7 +3728,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   .amzkit-sub { font-size: 17px; }
 }
 @media (max-width: 480px) {
-  .amzkit-sec { padding: 56px 16px; }
+  .amzkit-sec { padding: 56px 16px; border-radius: 20px 20px 0 0; }
   .amzkit-h2 { font-size: 30px; }
   .amzkit-card { border-radius: 22px; }
   .amzkit-body { padding: 24px 22px 28px; }
@@ -3244,149 +3736,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   .amzkit-card-p { font-size: 16px; }
 }
 </style>
-
-<section class="amzkit-sec" id="amazon-kit">
-  <div class="amzkit-inner">
-    <div class="amzkit-head">
-      <span class="bonus-pill amzkit-pill appear">BONUS · $399 VALUE · FREE</span>
-      <h2 class="amzkit-h2 appear">What's inside your<br>Amazon Seller Kit</h2>
-      <p class="amzkit-sub appear d1">Everything real sellers used to launch, scale and earn — yours free when you start your store today.</p>
-    </div>
-
-    <div class="amzkit-grid">
-      <article class="amzkit-card appear d1">
-        <div class="amzkit-visual amzkit-anim-launch">
-          <img src="img/AmazonKit/amazon_store.png" alt="Amazon seller storefront preview" loading="lazy">
-          <div class="launch-checklist">
-            <div class="lc-header">
-              <span class="lc-title">SETUP COMPLETE</span>
-              <span class="lc-done-badge" aria-hidden="true">
-                <svg class="lc-progress-ring" viewBox="0 0 36 36">
-                  <circle class="lc-ring-fg" cx="18" cy="18" r="16" pathLength="100"></circle>
-                </svg>
-              </span>
-            </div>
-            <ul class="lc-items">
-              <li class="lc-item lc-item-1">
-                <span class="lc-num">1</span>
-                <span class="lc-text">Create account</span>
-                <span class="lc-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-              </li>
-              <li class="lc-item lc-item-2">
-                <span class="lc-num">2</span>
-                <span class="lc-text">List your products</span>
-                <span class="lc-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-              </li>
-              <li class="lc-item lc-item-3">
-                <span class="lc-num">3</span>
-                <span class="lc-text">Store published</span>
-                <span class="lc-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="amzkit-body">
-          <h3 class="amzkit-card-h3">Launch on Amazon in days, not months</h3>
-          <p class="amzkit-card-p">Step-by-step setup walks you from zero to a published seller account — no guesswork, no Amazon paperwork rabbit holes.</p>
-        </div>
-      </article>
-
-      <article class="amzkit-card appear d2">
-        <div class="amzkit-visual amzkit-anim-buyers" aria-label="Pet care guide reaching shoppers worldwide">
-
-          <!-- View A: product card on solid background -->
-          <div class="anim-view view-product">
-            <div class="prod-card">
-              <div class="prod-hero"><img src="img/AmazonKit/dog-guide.jpg" alt=""></div>
-              <div class="prod-info">
-                <div class="prod-title">Dog Care Made Simple</div>
-                <div class="prod-desc">Train, feed and love your pup with confidence.</div>
-                <div class="prod-rating">
-                  <span class="rating-stars" aria-label="5 out of 5 stars">★★★★★</span>
-                  <span class="rating-count">(214 reviews)</span>
-                </div>
-                <div class="prod-price">US $24.00</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- View B: world map + dog pins + floating panel with avatar row -->
-          <div class="anim-view view-globe">
-            <div class="map-bg"></div>
-            <div class="map-pin pin-1"><div class="pin-dot"></div><div class="pin-thumb"><img src="img/AmazonKit/amazon_logo.webp" alt="Amazon" loading="lazy"></div></div>
-            <div class="map-pin pin-2"><div class="pin-dot"></div><div class="pin-thumb"><img src="img/AmazonKit/amazon_logo.webp" alt="Amazon" loading="lazy"></div></div>
-            <div class="map-pin pin-3"><div class="pin-dot"></div><div class="pin-thumb"><img src="img/AmazonKit/amazon_logo.webp" alt="Amazon" loading="lazy"></div></div>
-            <div class="map-pin pin-4"><div class="pin-dot"></div><div class="pin-thumb"><img src="img/AmazonKit/amazon_logo.webp" alt="Amazon" loading="lazy"></div></div>
-
-            <div class="globe-panel">
-              <div class="gp-avatars">
-                <img src="img/AmazonKit/avatar-1.jpg" alt="">
-                <img src="img/AmazonKit/avatar-2.jpg" alt="">
-                <img src="img/AmazonKit/avatar-3.jpg" alt="">
-                <img src="img/AmazonKit/avatar-4.jpg" alt="">
-                <img src="img/AmazonKit/avatar-5.jpg" alt="">
-              </div>
-              <div class="gp-headline">Your product just got noticed</div>
-              <div class="gp-bar"><div class="gp-bar-fill"></div></div>
-              <div class="gp-status">+<span class="gp-count-num"></span> shoppers viewed today</div>
-            </div>
-          </div>
-
-        </div>
-        <div class="amzkit-body">
-          <h3 class="amzkit-card-h3">Tap into 300M ready-to-buy shoppers</h3>
-          <p class="amzkit-card-p">Your products land in front of Amazon's existing audience — buyers already in checkout mode. No cold traffic to warm up.</p>
-        </div>
-      </article>
-
-      <article class="amzkit-card appear d3">
-        <div class="amzkit-visual amzkit-visual-revenue">
-          <img src="img/AmazonKit/revenue-man.jpg" alt="Amazon seller tracking earnings growth at home" loading="lazy">
-          <div class="revenue-card">
-            <div class="rc-title">THIS MONTH'S EARNINGS</div>
-            <div class="rc-value"><span class="rc-num"></span></div>
-            <div class="rc-chart">
-              <span class="rc-bar rc-bar-1"></span>
-              <span class="rc-bar rc-bar-2"></span>
-              <span class="rc-bar rc-bar-3"></span>
-              <span class="rc-bar rc-bar-4"></span>
-              <span class="rc-bar rc-bar-5"></span>
-              <span class="rc-bar rc-bar-6"></span>
-            </div>
-            <div class="rc-delta">
-              <span class="rc-delta-badge">↑ 43%</span>
-              <span class="rc-delta-text">vs last month</span>
-            </div>
-          </div>
-        </div>
-        <div class="amzkit-body">
-          <h3 class="amzkit-card-h3">Earn from a $514B marketplace</h3>
-          <p class="amzkit-card-p">Get your share of the world's biggest online marketplace. Sellers using our kit see their first sales within weeks.</p>
-        </div>
-      </article>
-
-      <article class="amzkit-card appear d4">
-        <div class="amzkit-visual amzkit-anim-toolkits" aria-label="Sellvia storefront with 100+ AI toolkits">
-          <div class="toolkit-slot toolkit-slot-left">
-            <img class="toolkit-img toolkit-left" src="img/AmazonKit/toolkits 1.png?v=3" alt="Sellvia storefront AI toolkit preview" loading="lazy">
-          </div>
-          <div class="toolkit-slot toolkit-slot-right">
-            <img class="toolkit-img toolkit-right" src="img/AmazonKit/toolkits 2.png?v=3" alt="Sellvia storefront AI toolkit preview" loading="lazy">
-          </div>
-        </div>
-        <div class="amzkit-body">
-          <h3 class="amzkit-card-h3">100+ AI toolkits, already in your store</h3>
-          <p class="amzkit-card-p">Your store opens pre-loaded with our top-converting AI toolkits — listed, designed, priced. Just hit publish and your customers can buy on day one.</p>
-        </div>
-      </article>
-    </div>
-
-    <div class="amzkit-cta appear d4">
-      <a href="https://sellvia.com/checkout/?product=custom&type_custom=free_basic_hosting" class="btn btn-filled">Get my free store + Amazon Kit</a>
-      <p class="amzkit-fine">$399 value · Yours free with any plan</p>
-    </div>
-  </div>
-</section>
 
 <!-- ═══ FINAL CTA ═══ -->
 <section class="final-sec">
@@ -3534,6 +3883,21 @@ const io = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.08, rootMargin: '0px 0px -48px 0px' });
 document.querySelectorAll('.appear, .appear-l, .appear-r, .appear-scale').forEach(el => io.observe(el));
+
+// ── Amzkit cards: play/pause animations on mobile based on viewport ──
+// (Desktop uses :hover via CSS; on touch devices IntersectionObserver toggles .amzkit-active)
+(() => {
+  const touchDevice = window.matchMedia('(hover: none)').matches;
+  if (!touchDevice) return;
+  const cards = document.querySelectorAll('.amzkit-grid .amzkit-card');
+  if (!cards.length || !('IntersectionObserver' in window)) return;
+  const amzkitIo = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      e.target.classList.toggle('amzkit-active', e.isIntersecting);
+    });
+  }, { threshold: 0.35 });
+  cards.forEach(c => amzkitIo.observe(c));
+})();
 
 // ── HERO PARALLAX (removed — now using slideshow) ──
 
