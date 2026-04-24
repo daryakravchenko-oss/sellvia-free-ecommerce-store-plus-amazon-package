@@ -495,12 +495,14 @@ button { cursor: pointer; font-family: var(--font); outline: none; border: none;
   color: #fff;
   letter-spacing: -0.02em;
   line-height: 1;
+  text-align: left;
 }
 .hf-dash-sub {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.6);
   margin-top: 4px;
   margin-bottom: 12px;
+  text-align: left;
 }
 .hf-chart {
   display: flex;
@@ -557,7 +559,7 @@ button { cursor: pointer; font-family: var(--font); outline: none; border: none;
   font-weight: 700;
   color: #fff;
   letter-spacing: -0.04em;
-  line-height: 1.02;
+  line-height: 1.17;
   margin-bottom: 24px;
   opacity: 0;
   animation: fadeUp 0.9s var(--ease-out) 0.35s forwards;
@@ -565,6 +567,39 @@ button { cursor: pointer; font-family: var(--font); outline: none; border: none;
 .hero-h1 em {
   font-style: normal;
   color: var(--c-amber);
+}
+/* ── Amazon word inside hero H1: amber, reveals L→R, then smile-arrow ── */
+.hero-amazon {
+  color: #f5a623;
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+.hero-amazon-word {
+  display: inline-block;
+  clip-path: inset(0 0 0 100%);
+  -webkit-clip-path: inset(0 0 0 100%);
+  animation: amz-word-reveal 0.7s cubic-bezier(0.25, 0.1, 0.25, 1) 0s forwards;
+}
+.hero-amazon-smile {
+  position: absolute;
+  left: -8px;
+  width: 95%;
+  bottom: calc(-0.1em - 11px);
+  height: calc((0.3em + 10px) * 0.95);
+  pointer-events: none;
+  display: block;
+  opacity: 0;
+  animation: amz-smile-appear 0.01s linear 0.7s forwards;
+}
+@keyframes amz-word-reveal {
+  to {
+    clip-path: inset(0 0 0 0);
+    -webkit-clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes amz-smile-appear {
+  to { opacity: 1; }
 }
 .hero-sub {
   font-size: clamp(19px, 2.5vw, 24px);
@@ -590,7 +625,8 @@ button { cursor: pointer; font-family: var(--font); outline: none; border: none;
 }
 @media(max-width:600px) {
   .hero { padding: 56px 16px; }
-  .hero-h1 { font-size: clamp(36px, 10vw, 52px); }
+  .hero-h1 { font-size: clamp(36px, 10vw, 52px); line-height: 1.55; }
+  .hero-amazon-smile { bottom: calc(-0.1em - 8px); }
   .hero-inner { width: 100%; align-items: center; text-align: center; }
   .hero-actions { padding: 0 8px; }
 }
@@ -954,10 +990,10 @@ section { padding: 120px 24px; }
 }
 
 /* ════ SECTION 4: WHAT DO I GET (features) ════ */
-.get-sec { background: #000; position: relative; overflow: hidden; }
+.get-sec { background: #FAEFDE; position: relative; overflow: hidden; }
 .get-sec .sec-in { position: relative; z-index: 2; }
-.get-sec .sec-title-xl { color: #fff; }
-.get-sec .sec-body { color: rgba(255,255,255,0.6); }
+.get-sec .sec-title-xl { color: var(--c-near); }
+.get-sec .sec-body { color: var(--c-gray2); }
 
 /* Cursor glow orb */
 .glow-orb {
@@ -986,14 +1022,14 @@ section { padding: 120px 24px; }
   grid-template-columns: repeat(3, 1fr);
   gap: 2px;
   margin-top: 72px;
-  background: rgba(255,255,255,0.06);
+  background: transparent;
   border-radius: 24px;
   overflow: hidden;
   position: relative;
   z-index: 2;
 }
 .get-card {
-  background: rgba(22,22,23,0.85);
+  background: rgba(255,255,255,0.82);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   padding: 44px 36px;
@@ -1002,7 +1038,7 @@ section { padding: 120px 24px; }
   gap: 0;
   transition: background 0.3s;
 }
-.get-card:hover { background: rgba(29,29,31,0.85); }
+.get-card:hover { background: rgba(255,255,255,0.72); }
 .get-icon {
   width: 48px;
   height: 48px;
@@ -1018,12 +1054,12 @@ section { padding: 120px 24px; }
 .get-card h3 {
   font-size: 20px;
   font-weight: 700;
-  color: #fff;
+  color: var(--c-near);
   letter-spacing: -0.02em;
   margin-bottom: 10px;
   line-height: 1.25;
 }
-.get-card p { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.65; }
+.get-card p { font-size: 14px; color: var(--c-gray2); line-height: 1.65; }
 @media(max-width:800px) { .get-grid { grid-template-columns: 1fr 1fr; } }
 @media(max-width:500px) { .get-grid { grid-template-columns: 1fr; } }
 
@@ -1248,7 +1284,7 @@ section { padding: 120px 24px; }
 }
 
 /* ════ RATINGS ════ */
-.ratings-sec { background: var(--c-near); padding: 120px 24px; }
+.ratings-sec { background: var(--c-near); padding: 120px 24px; position: relative; }
 @media(max-width:1200px) { .ratings-sec { padding: 100px 24px; } }
 @media(max-width:860px)  { .ratings-sec { padding: 72px 24px; } }
 @media(max-width:480px)  { .ratings-sec { padding: 56px 16px; } }
@@ -1445,13 +1481,6 @@ section { padding: 120px 24px; }
   position: relative;
   overflow: hidden;
 }
-.final-glow {
-  position: absolute;
-  top: 0; left: 50%; transform: translateX(-50%);
-  width: 600px; height: 400px;
-  background: radial-gradient(ellipse at center top, rgba(245,166,35,0.12) 0%, transparent 65%);
-  pointer-events: none;
-}
 .final-in { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; }
 .final-h2 {
   font-size: clamp(44px, 7vw, 80px);
@@ -1473,7 +1502,7 @@ section { padding: 120px 24px; }
 @media(max-width:480px) { .final-sec { padding: 56px 16px; } }
 
 /* ════ FOOTER ════ */
-footer { background: #000; border-top: 1px solid rgba(255,255,255,0.08); }
+footer { background: #000; border-top: 1px solid rgba(255,255,255,0.08); position: relative; }
 .footer-top {
   max-width: var(--max-wide);
   margin: 0 auto;
@@ -1742,7 +1771,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <ul class="nav-links">
       <li><a href="#why">Why Sellvia</a></li>
       <li><a href="#get">What's included</a></li>
-      <li><a href="#bonus">Bonus</a></li>
       <li><a href="#faq">FAQ</a></li>
     </ul>
     <!-- RIGHT: actions -->
@@ -1798,7 +1826,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span class="hf-snap-lbl">Your Amazon store</span>
         <span class="hf-badge">↑ 43%</span>
       </div>
-      <div class="hf-dash-val">$8,240</div>
+      <div class="hf-dash-val">$6,924</div>
       <div class="hf-dash-sub">earned this month</div>
       <div class="hf-chart">
         <span class="hf-bar" style="--h: 22%"></span>
@@ -1812,8 +1840,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
   <div class="hero-inner">
     <p class="hero-eyebrow">Free for 14 days · No experience needed</p>
-    <h1 class="hero-h1">Start your<br>online business<br>for <em>FREE</em> today.</h1>
-    <p class="hero-sub">Claim your perfect ecommerce store with hot-selling products. It will run on autopilot and generate profits for years to come.</p>
+    <h1 class="hero-h1">Start your<br><span class="hero-amazon"><span class="hero-amazon-word">Amazon</span><img class="hero-amazon-smile" src="img/Hero/arrow.svg" alt="" aria-hidden="true"></span> business<br>for free today.</h1>
+    <p class="hero-sub">Your free online store plus the complete seller kit — everything top sellers use to launch, scale and earn.</p>
     <div class="hero-actions">
       <a href="https://sellvia.com/checkout/?product=custom&type_custom=free_basic_hosting" class="btn btn-filled btn-pulse">Get my free store</a>
     </div>
@@ -2194,8 +2222,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="sec-in">
     <div class="appear" style="text-align:center">
       <div class="sec-label" style="color:var(--c-amber)">Included</div>
-      <h2 class="sec-title-xl" style="color:#fff">What do I get for free?</h2>
-      <p style="font-size:19px;color:rgba(255,255,255,0.55);line-height:1.5;max-width:500px;margin:0 auto">Everything you need to sell online and succeed!</p>
+      <h2 class="sec-title-xl">What do I get for free?</h2>
+      <p style="font-size:19px;color:var(--c-gray2);line-height:1.5;max-width:500px;margin:0 auto">Everything you need to sell online and succeed!</p>
     </div>
     <div class="get-grid">
       <div class="get-card appear d1">
@@ -2243,487 +2271,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div style="text-align:center;margin-top:56px" class="appear">
       <a href="https://sellvia.com/checkout/?product=custom&type_custom=free_basic_hosting" class="btn btn-filled" id="getCtaBtn">Get my free store</a>
-      <p style="margin-top:12px;font-size:13px;color:rgba(255,255,255,0.3)">Get started in less than 60 seconds • Cancel anytime</p>
+      <p style="margin-top:12px;font-size:13px;color:#6e6e73">Get started in less than 60 seconds • Cancel anytime</p>
     </div>
   </div>
 </section>
 
-<!-- ═══ BONUS ═══ -->
-<style>
-/* bonus-section fits naturally as a full-width page section */
-.bonus-section {
-  background: #f5f5f7;
-  padding: 120px 24px;
-  width: 100%;
-  position: relative;
-}
-
-.bonus-inner {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 72px;
-  align-items: center;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-/* ── LEFT ── */
-.bonus-left { display: flex; flex-direction: column; }
-
-.bonus-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: #1d1d1f;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  padding: 7px 18px;
-  border-radius: 100px;
-  margin-bottom: 24px;
-  width: fit-content;
-  position: relative;
-  overflow: hidden;
-}
-.bonus-pill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 80%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%);
-  animation: pillShine 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-@keyframes pillShine {
-  0% { left: -100%; }
-  100% { left: 150%; }
-}
-
-.bonus-heading {
-  font-size: 42px;
-  font-weight: 700;
-  color: #1d1d1f;
-  letter-spacing: -.028em;
-  line-height: 1.07;
-  margin-bottom: 12px;
-  opacity: 0;
-  animation: fadeUp .55s ease .15s forwards;
-}
-
-.bonus-sub {
-  font-size: 19px;
-  color: #6e6e73;
-  margin-bottom: 28px;
-  opacity: 0;
-  animation: fadeUp .55s ease .22s forwards;
-}
-
-.price-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 32px;
-  opacity: 0;
-  animation: fadeUp .55s ease .3s forwards;
-}
-.price-label { font-size: 15px; color: #6e6e73; }
-.price-original {
-  font-size: 15px;
-  font-weight: 600;
-  color: #6e6e73;
-  text-decoration: line-through;
-  text-decoration-color: #ff3b30;
-  text-decoration-thickness: 1.5px;
-}
-
-.bullets { list-style: none; border-top: 1px solid #d2d2d7; margin-bottom: 36px; }
-
-.bullet-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 18px 0;
-  border-bottom: 1px solid #d2d2d7;
-  cursor: pointer;
-  position: relative;
-  opacity: 0;
-  animation: fadeUp .45s ease forwards;
-}
-.bullet-item:nth-child(1) { animation-delay: .38s; }
-.bullet-item:nth-child(2) { animation-delay: .46s; }
-.bullet-item:nth-child(3) { animation-delay: .54s; }
-
-.bullet-item::before {
-  content: '';
-  position: absolute;
-  left: -65px; top: 0; bottom: 0;
-  width: 3px;
-  background: #1d1d1f;
-  border-radius: 0 2px 2px 0;
-  opacity: 0;
-  transition: opacity .2s;
-}
-.bullet-item.active::before { opacity: 1; }
-
-.bullet-text {
-  font-size: 15px;
-  color: #1d1d1f;
-  line-height: 1.45;
-  font-weight: 400;
-  transition: font-weight .15s;
-}
-.bullet-item.active .bullet-text { font-weight: 600; }
-
-.bullet-arrow {
-  flex-shrink: 0;
-  width: 18px; height: 18px;
-  color: #1d1d1f;
-  opacity: .28;
-  transition: opacity .2s, transform .2s;
-}
-.bullet-item.active .bullet-arrow { opacity: 1; transform: translateX(2px); }
-
-.cta-wrap { opacity: 0; animation: fadeUp .55s ease .65s forwards; }
-.cta-btn {
-  display: inline-flex;
-  background: #1d1d1f;
-  color: #fff;
-  font-family: inherit;
-  font-size: 19px;
-  font-weight: 600;
-  padding: 14px 30px;
-  border-radius: 980px;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background .2s, transform .15s;
-}
-.cta-btn:hover { background: #3a3a3c; transform: scale(1.02); }
-
-/* ── RIGHT ── */
-.bonus-right {
-  position: relative;
-  height: 520px;
-  border-radius: 20px;
-  overflow: hidden;
-  opacity: 0;
-  animation: fadeUp .6s ease .2s forwards;
-}
-
-.panel {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transform: scale(.97) translateY(10px);
-  transition: opacity .55s cubic-bezier(.25,.46,.45,.94), transform .55s cubic-bezier(.25,.46,.45,.94);
-  pointer-events: none;
-}
-.panel.visible { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
-
-.panel-photo {
-  position: absolute;
-  width: 100%; height: 100%;
-  object-fit: cover; object-position: center top;
-  display: block;
-  top: 0; left: 0;
-}
-
-/* ── WHITE FROSTED GLASS — очень прозрачные (35%) ── */
-.lcard {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.35);
-  backdrop-filter: blur(20px) saturate(1.5);
-  -webkit-backdrop-filter: blur(20px) saturate(1.5);
-  border: 1px solid rgba(255,255,255,.55);
-  border-radius: 16px;
-  padding: 14px 16px;
-  box-shadow: 0 4px 24px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.7);
-  font-family: inherit;
-  color: #1d1d1f;
-  /* Броуновское движение через JS — transform будет перезаписан */
-  will-change: transform;
-}
-
-/* ── PANEL 0: Woman with laptop ── */
-.card-store {
-  top: 24px; right: 20px; width: 230px;
-  display: flex; gap: 11px; align-items: flex-start;
-}
-.cs-icon {
-  width: 34px; height: 34px; border-radius: 9px;
-  background: linear-gradient(135deg,#22c55e,#16a34a);
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.cs-icon svg { width: 17px; height: 17px; }
-.cs-body { flex: 1; min-width: 0; }
-.cs-title { font-size: 12.5px; font-weight: 600; color: #1d1d1f; line-height: 1.3; margin-bottom: 2px; }
-.cs-sub   { font-size: 11px; color: rgba(0,0,0,.45); line-height: 1.3; }
-.cs-prog  { margin-top: 9px; height: 3px; background: rgba(0,0,0,.08); border-radius: 2px; overflow: hidden; }
-.cs-prog-bar { height: 100%; background: linear-gradient(90deg,#22c55e,#16a34a); animation: progressFill 2s ease-in-out infinite; }
-.cs-live { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; flex-shrink: 0; margin-top: 4px; box-shadow: 0 0 6px rgba(34,197,94,.7); animation: livePulse 1.8s ease-in-out infinite; }
-
-.card-steps {
-  bottom: 32px; right: 20px; width: 196px;
-}
-.card-label { font-size: 10px; color: rgba(0,0,0,.38); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 10px; }
-.step-row { display: flex; align-items: center; gap: 9px; padding: 5px 0; }
-.step-row + .step-row { border-top: 1px solid rgba(0,0,0,.07); margin-top: 1px; }
-.step-num { width: 20px; height: 20px; border-radius: 6px; background: rgba(22,163,74,.15); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #15803d; flex-shrink: 0; }
-.step-text { font-size: 11.5px; color: rgba(0,0,0,.68); line-height: 1.3; flex: 1; }
-.step-check { color: #15803d; font-size: 13px; }
-
-/* ── PANEL 1: Man with phone — только ОДНА плашка внизу слева ── */
-.card-users {
-  bottom: 28px; right: 20px; width: 210px;
-}
-/* аватарки — фото без обводки */
-.av-row { display: flex; align-items: center; margin-bottom: 12px; }
-.av {
-  width: 34px; height: 34px; border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-  /* NO border */
-}
-.av + .av { margin-left: -10px; }
-.av img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.av-divider { width: 100%; height: 1px; background: rgba(0,0,0,.1); margin-bottom: 10px; }
-.users-count { font-size: 22px; font-weight: 800; color: #1d1d1f; letter-spacing: -.04em; line-height: 1; }
-.users-label { font-size: 11px; color: rgba(0,0,0,.42); margin-top: 3px; }
-.online-row { display: flex; align-items: center; gap: 7px; margin-top: 10px; }
-.online-dot { width: 7px; height: 7px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 5px rgba(22,163,74,.6); animation: livePulse 1.8s ease-in-out infinite; }
-.online-txt { font-size: 11px; color: rgba(0,0,0,.42); }
-.online-num { font-size: 11px; color: #15803d; font-weight: 700; margin-left: auto; }
-
-/* ── PANEL 2: Woman portrait ── */
-.card-rev {
-  top: 24px; right: 20px; width: 206px;
-}
-.rev-amount { font-size: 28px; font-weight: 800; color: #1d1d1f; letter-spacing: -.04em; line-height: 1; margin-bottom: 2px; }
-.rev-period { font-size: 11px; color: rgba(0,0,0,.38); margin-bottom: 12px; }
-.rev-chart { display: flex; align-items: flex-end; gap: 4px; height: 44px; margin-bottom: 9px; }
-.rbar { border-radius: 3px 3px 0 0; flex: 1; }
-.rbar.low { background: rgba(0,0,0,.1); }
-.rbar.mid { background: rgba(59,130,246,.35); }
-.rbar.hi  { background: #3b82f6; }
-.rbar.top { background: linear-gradient(180deg,#60a5fa,#2563eb); }
-.rev-trend { display: flex; align-items: center; gap: 8px; padding-top: 9px; border-top: 1px solid rgba(0,0,0,.08); }
-.trend-badge { background: rgba(22,163,74,.12); border: 1px solid rgba(22,163,74,.25); color: #15803d; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 6px; }
-.trend-lbl { font-size: 11px; color: rgba(0,0,0,.38); }
-
-.card-milestone {
-  bottom: 32px; left: 20px; width: 200px;
-}
-.ms-header { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
-.ms-icon { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg,#fbbf24,#f59e0b); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
-.ms-title { font-size: 12px; font-weight: 600; color: #1d1d1f; line-height: 1.2; }
-.ms-sub   { font-size: 11px; color: rgba(0,0,0,.42); line-height: 1.3; margin-top: 1px; }
-.ms-stat  { font-size: 26px; font-weight: 800; color: #d97706; letter-spacing: -.04em; }
-.ms-stat-label { font-size: 10px; color: rgba(0,0,0,.38); letter-spacing: .06em; text-transform: uppercase; margin-top: 1px; }
-
-/* dots */
-.dot-nav { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); display: flex; gap: 7px; z-index: 20; }
-.dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(0,0,0,.2); transition: background .25s, width .25s; cursor: pointer; }
-.dot.active { background: #1d1d1f; width: 20px; border-radius: 3px; }
-
-/* ── KEYFRAMES ── */
-@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-@keyframes progressFill { 0%{transform:translateX(-100%)} 100%{transform:translateX(0)} }
-@keyframes livePulse { 0%,100%{opacity:1} 50%{opacity:.35} }
-
-@media(max-width:1200px){ .bonus-section{padding:100px 24px} }
-@media(max-width:860px){
-  .bonus-section{padding:72px 24px}
-  .bonus-inner{grid-template-columns:1fr;gap:48px}
-  .bonus-right{height:360px}
-  .bonus-heading{font-size:32px}
-}
-@media(max-width:760px){
-  .bonus-left { align-items: center; text-align: center; }
-  .bonus-pill { margin-left: auto; margin-right: auto; }
-  .bonus-heading { text-align: center; }
-  .bonus-sub { text-align: center; }
-  .bullets { text-align: left; }
-  .cta-wrap { text-align: center; }
-}
-@media(max-width:860px){
-  img.panel-2-photo { top: -50px !important; height: calc(100% + 50px) !important; }
-}
-@media(max-width:480px){ .bonus-section{padding:56px 16px} .bullet-item { gap: 10px; } }
-</style>
-
-<section class="bonus-section" id="bonus">
-  <div class="bonus-inner">
-
-    <!-- LEFT -->
-    <div class="bonus-left">
-      <span class="bonus-pill">BONUS</span>
-      <h2 class="bonus-heading">Get an Amazon<br>Seller Kit for FREE</h2>
-      <p class="bonus-sub">When you act here and now!</p>
-      <ul class="bullets" id="bulletList">
-        <li class="bullet-item active" data-panel="0">
-          <span class="bullet-text">Fast and easy start of your own Amazon store</span>
-          <svg class="bullet-arrow" viewBox="0 0 24 24" fill="none"><path d="M8.91 19.92l6.52-6.52c.77-.77.77-2.03 0-2.8L8.91 4.08" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </li>
-        <li class="bullet-item" data-panel="1">
-          <span class="bullet-text">Access to 300 million active marketplace users</span>
-          <svg class="bullet-arrow" viewBox="0 0 24 24" fill="none"><path d="M8.91 19.92l6.52-6.52c.77-.77.77-2.03 0-2.8L8.91 4.08" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </li>
-        <li class="bullet-item" data-panel="2">
-          <span class="bullet-text">A share of Amazon's $514 billion in revenue</span>
-          <svg class="bullet-arrow" viewBox="0 0 24 24" fill="none"><path d="M8.91 19.92l6.52-6.52c.77-.77.77-2.03 0-2.8L8.91 4.08" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </li>
-      </ul>
-      <div class="cta-wrap"><a href="https://sellvia.com/checkout/?product=custom&type_custom=free_basic_hosting" class="btn btn-filled">Get my free store + Amazon Kit</a></div>
-    </div>
-
-    <!-- RIGHT -->
-    <div class="bonus-right" id="panelWrap">
-
-      <!-- PANEL 0 -->
-      <div class="panel visible" id="panel-0">
-        <img class="panel-photo" src="img/Bonus/2148.webp" alt="Woman with laptop" style="top:-100px; height:calc(100% + 100px); object-position:center top;">
-        <div class="lcard card-steps" data-brownian data-delay="0.7">
-          <div class="card-label">Setup complete</div>
-          <div class="step-row"><div class="step-num">1</div><div class="step-text">Create account</div><span class="step-check">✓</span></div>
-          <div class="step-row"><div class="step-num">2</div><div class="step-text">List your products</div><span class="step-check">✓</span></div>
-          <div class="step-row"><div class="step-num">3</div><div class="step-text">Store published</div><span class="step-check">✓</span></div>
-        </div>
-      </div>
-
-      <!-- PANEL 1 — ТОЛЬКО ОДНА ПЛАШКА (bottom-left), аватарки с реальными фото -->
-      <div class="panel" id="panel-1">
-        <img class="panel-photo" src="img/Bonus/2149.webp?v=3" alt="Man with phone" style="top:-60px; height:calc(100% + 60px); object-position:center top;">
-        <div class="lcard card-users" data-brownian data-delay="0.3">
-          <!-- Аватарки с реальными лицами, без обводок -->
-          <div class="av-row">
-            <div class="av"><img src="img/Bonus/2122.webp" alt=""></div>
-            <div class="av"><img src="img/Bonus/2125.webp" alt=""></div>
-            <div class="av"><img src="img/Bonus/2126.webp" alt=""></div>
-            <div class="av"><img src="img/Bonus/2127.webp" alt=""></div>
-            <div class="av"><img src="img/Bonus/2129.webp" alt=""></div>
-          </div>
-          <!-- Разделитель -->
-          <div class="av-divider"></div>
-          <!-- Всё что под чертой -->
-          <div class="users-count">300M</div>
-          <div class="users-label">Active buyers worldwide</div>
-          <div class="online-row">
-            <div class="online-dot"></div>
-            <span class="online-txt">Right now online</span>
-            <span class="online-num">2.4M</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- PANEL 2 -->
-      <div class="panel" id="panel-2">
-        <img class="panel-photo panel-2-photo" src="img/Bonus/2119.webp" alt="Happy woman" style="top:-30px; height:calc(100% + 30px); object-position:center top;">
-        <div class="lcard card-rev" data-brownian style="top:auto;right:auto;bottom:32px;left:20px;width:206px;">
-          <div class="rev-amount">$8,240</div>
-          <div class="rev-period">This month's earnings</div>
-          <div class="rev-chart">
-            <div class="rbar low" style="height:24%"></div>
-            <div class="rbar low" style="height:38%"></div>
-            <div class="rbar mid" style="height:32%"></div>
-            <div class="rbar mid" style="height:55%"></div>
-            <div class="rbar hi"  style="height:48%"></div>
-            <div class="rbar hi"  style="height:72%"></div>
-            <div class="rbar top" style="height:100%"></div>
-          </div>
-          <div class="rev-trend">
-            <span class="trend-badge">↑ 43%</span>
-            <span class="trend-lbl">vs last month</span>
-          </div>
-        </div>
-      </div>
-
-      <!--<div class="dot-nav">-->
-      <!--  <div class="dot active" data-dot="0"></div>-->
-      <!--  <div class="dot" data-dot="1"></div>-->
-      <!--  <div class="dot" data-dot="2"></div>-->
-      <!--</div>-->
-    </div>
-
-  </div>
-</section>
-
-<script>
-/* ── Bonus block — isolated scope to avoid variable conflicts ── */
-;(function() {
-
-  /* ── Panel switching ── */
-  const bullets = document.querySelectorAll('.bullet-item');
-  const panels  = document.querySelectorAll('.panel');
-//   const bonusDots = document.querySelectorAll('.dot');
-
-  function activate(i) {
-    bullets.forEach(b => b.classList.remove('active'));
-    panels.forEach(p  => p.classList.remove('visible'));
-    // bonusDots.forEach(d => d.classList.remove('active'));
-    bullets[i].classList.add('active');
-    panels[i].classList.add('visible');
-    // bonusDots[i].classList.add('active');
-  }
-  bullets.forEach((b, i) => {
-    b.addEventListener('mouseenter', () => activate(i));
-    b.addEventListener('click', () => activate(i));
-  });
-//   bonusDots.forEach((d, i) => d.addEventListener('click', () => activate(i)));
-
-  /* ── Brownian motion ──
-     Each card gets its own independent Ornstein-Uhlenbeck process:
-     smooth random walk that keeps cards close to their anchor position.
-  */
-  class Brownian {
-    constructor(el) {
-      this.el = el;
-      this.delay = parseFloat(el.dataset.delay || 0);
-      this.vx = 0; this.vy = 0;
-      this.x  = 0; this.y  = 0;
-      this.theta = 0.002;
-      this.sigma = 0.09;
-      this.maxD  = 54;
-      this.lastT = null;
-      this.t = this.delay * 60;
-    }
-
-    tick(ts) {
-      if (!this.lastT) { this.lastT = ts; }
-      const dt = Math.min((ts - this.lastT) / 16.67, 3);
-      this.lastT = ts;
-      this.t += dt;
-      const noise = () => (Math.random() + Math.random() + Math.random() - 1.5) * 1.155;
-      this.vx += (-this.theta * this.x + this.sigma * noise()) * dt;
-      this.vy += (-this.theta * this.y + this.sigma * noise()) * dt;
-      this.vx *= 0.99;
-      this.vy *= 0.99;
-      this.x  += this.vx * dt;
-      this.y  += this.vy * dt;
-      const d = Math.sqrt(this.x * this.x + this.y * this.y);
-      if (d > this.maxD) { this.x *= this.maxD / d; this.y *= this.maxD / d; }
-      this.el.style.transform = `translate(${this.x.toFixed(2)}px, ${this.y.toFixed(2)}px)`;
-    }
-  }
-
-  const bonusCards = Array.from(document.querySelectorAll('[data-brownian]')).map(el => new Brownian(el));
-
-  function bonusLoop(ts) {
-    bonusCards.forEach(c => c.tick(ts));
-    requestAnimationFrame(bonusLoop);
-  }
-  requestAnimationFrame(bonusLoop);
-
-
-})();
-</script>
 
 <!-- ═══ STORE DESIGNS MARQUEE ═══ -->
 <style>
-.store-sec { background: #000; padding: 120px 0; overflow: hidden; }
+.store-sec { background: #000; padding: 120px 0; overflow: hidden; position: relative; }
 @media(max-width:1200px) { .store-sec { padding: 100px 0; } }
 @media(max-width:860px)  { .store-sec { padding: 72px 0; } }
 @media(max-width:480px)  { .store-sec { padding: 56px 0; } }
@@ -3007,7 +2563,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   flex-direction: column;
   align-items: center;
 }
-.amzkit-pill { margin-bottom: 22px; }
+.amzkit-pill {
+  display: inline-block;
+  background: #1d1d1f;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 8px 16px;
+  border-radius: 999px;
+  margin-bottom: 22px;
+}
 .amzkit-h2 {
   font-size: 56px;
   font-weight: 700;
@@ -3797,7 +3363,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   .amzkit-h2 { font-size: 48px; }
 }
 @media (max-width: 860px) {
-  .amzkit-sec { padding: 80px 40px; }
+  /* extra 50px bottom compensates for stat-bar's -50px margin-top overlap */
+  .amzkit-sec { padding: 80px 40px 130px; }
   .amzkit-grid { grid-template-columns: 1fr; gap: 20px; }
   .amzkit-h2 { font-size: 40px; }
   .amzkit-sub { font-size: 19px; }
@@ -3806,12 +3373,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   .amzkit-card-h3 { font-size: 24px; }
 }
 @media (max-width: 600px) {
-  .amzkit-sec { padding: 64px 24px; }
+  .amzkit-sec { padding: 64px 24px 114px; }
   .amzkit-h2 { font-size: 34px; }
   .amzkit-sub { font-size: 17px; }
 }
 @media (max-width: 480px) {
-  .amzkit-sec { padding: 56px 16px; border-radius: 20px 20px 0 0; }
+  .amzkit-sec { padding: 56px 16px 106px; border-radius: 20px 20px 0 0; }
   .amzkit-h2 { font-size: 30px; }
   .amzkit-card { border-radius: 22px; }
   .amzkit-body { padding: 24px 22px 28px; }
@@ -3822,7 +3389,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- ═══ FINAL CTA ═══ -->
 <section class="final-sec">
-  <div class="final-glow"></div>
+  <div class="hero-glows" aria-hidden="true">
+    <span class="hero-glow glow-left"></span>
+    <span class="hero-glow glow-right"></span>
+    <span class="hero-glow glow-dark-left"></span>
+    <span class="hero-glow glow-dark-right"></span>
+  </div>
   <div class="final-in">
     <h2 class="final-h2 appear">Your store is<br>waiting for you.</h2>
     <p class="final-sub appear d1">Your site, your products, your Amazon business – ready to go.</p>
@@ -3940,15 +3512,21 @@ window.addEventListener('scroll', () => {
 
 // ── STICKY CTA ──
 const stickyCta = document.getElementById('stickyCta');
-const heroEl = document.getElementById('hero');
-if (stickyCta && heroEl) {
+if (stickyCta) {
   const pageCtas = document.querySelectorAll('.btn-filled, .cta-btn');
   window.addEventListener('scroll', () => {
-    const heroBottom = heroEl.getBoundingClientRect().bottom;
-    if (heroBottom >= 0) { stickyCta.classList.remove('visible'); return; }
+    // Hero is position:sticky and never leaves the top — use scroll position
+    // instead. Consider user "past hero" after scrolling ~80% of one viewport.
+    if (window.scrollY < window.innerHeight * 0.8) {
+      stickyCta.classList.remove('visible');
+      return;
+    }
     let anyCtaVisible = false;
     pageCtas.forEach(btn => {
       if (btn.closest('.sticky-cta')) return;
+      // Skip buttons inside the sticky hero — their DOM rect always reads as
+      // on-screen even when visually covered by later sections.
+      if (btn.closest('#hero')) return;
       const r = btn.getBoundingClientRect();
       if (r.top < window.innerHeight - 80 && r.bottom > 80) anyCtaVisible = true;
     });
@@ -3967,19 +3545,17 @@ const io = new IntersectionObserver(entries => {
 }, { threshold: 0.08, rootMargin: '0px 0px -48px 0px' });
 document.querySelectorAll('.appear, .appear-l, .appear-r, .appear-scale').forEach(el => io.observe(el));
 
-// ── Amzkit cards: play/pause animations on mobile based on viewport ──
-// (Desktop uses :hover via CSS; on touch devices IntersectionObserver toggles .amzkit-active)
+// ── Amzkit cards: hover-like behavior for mouse AND touch ──
+// pointerenter/pointerleave fire uniformly for mouse hover and finger drag:
+// animation plays while pointer is inside the card, preview returns when it leaves.
 (() => {
-  const touchDevice = window.matchMedia('(hover: none)').matches;
-  if (!touchDevice) return;
   const cards = document.querySelectorAll('.amzkit-grid .amzkit-card');
-  if (!cards.length || !('IntersectionObserver' in window)) return;
-  const amzkitIo = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      e.target.classList.toggle('amzkit-active', e.isIntersecting);
-    });
-  }, { threshold: 0.35 });
-  cards.forEach(c => amzkitIo.observe(c));
+  if (!cards.length) return;
+  cards.forEach(card => {
+    card.addEventListener('pointerenter', () => card.classList.add('amzkit-active'));
+    card.addEventListener('pointerleave', () => card.classList.remove('amzkit-active'));
+    card.addEventListener('pointercancel', () => card.classList.remove('amzkit-active'));
+  });
 })();
 
 // ── HERO PARALLAX (removed — now using slideshow) ──
